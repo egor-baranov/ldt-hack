@@ -34,13 +34,14 @@ class _AccountState extends State<Account> {
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SingleChildScrollView(
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             verticalDirection: VerticalDirection.down,
             children: [
+              SizedBox(height: 16),
               const Text(
                 "Профиль",
                 style: TextStyle(fontWeight: FontWeight.w900, fontSize: 32),
@@ -96,7 +97,7 @@ class _AccountState extends State<Account> {
               accountCard("Кем выдан", "МВД ПО САНКТ-ПЕТЕРБУРГУ"),
               SizedBox(height: 8),
               accountCard("Адрес регистрации", "г. Санкт-Петербург"),
-              SizedBox(height: 8),
+              SizedBox(height: 16),
             ]),
       ),
     );

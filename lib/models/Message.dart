@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 class Message {
   final String text;
   final bool sentByUser;
+  final List<String> results;
 
-  Message({required this.text, required this.sentByUser});
+  const Message({required this.text, required this.sentByUser, required this.results});
 }

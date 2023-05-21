@@ -2,7 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+  const Dashboard({super.key, required this.onSearch});
+
+  final Function onSearch;
 
   @override
   State<Dashboard> createState() => _DashboardState();
@@ -42,13 +44,14 @@ class _DashboardState extends State<Dashboard> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text(
-                    "Мероприятия",
+                    "Главная",
                     style: TextStyle(fontWeight: FontWeight.w900, fontSize: 32),
                   ),
                   IconButton(
-                    onPressed: () {},
-                    iconSize: 32,
-                    icon: const Icon(CupertinoIcons.profile_circled),
+                    onPressed: () { widget.onSearch(); },
+                    iconSize: 28,
+                    color: CupertinoColors.darkBackgroundGray,
+                    icon: const Icon(CupertinoIcons.search),
                   ),
                 ],
               ),
@@ -142,7 +145,7 @@ class _DashboardState extends State<Dashboard> {
               dashboardCard("Вопрос в FAQ"),
               SizedBox(height: 8),
               dashboardCard("Вопрос в FAQ"),
-              SizedBox(height: 8),
+              SizedBox(height: 16),
             ]),
       ),
     );

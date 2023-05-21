@@ -5,38 +5,76 @@ import '../models/Message.dart';
 import '../styles/ColorResources.dart';
 
 class Chat extends StatefulWidget {
-
   const Chat({super.key});
+
+  static final List<Message> _messages = [];
 
   @override
   State<Chat> createState() => _ChatState();
 }
 
-
-
 class _ChatState extends State<Chat> {
-
-  Widget chatCard(String text, bool my) {
-    return Row(
-      mainAxisAlignment: my ? MainAxisAlignment.end : MainAxisAlignment.start,
+  Widget chatCard(String text, bool my, List<String> results) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 400),
-          child: Card(
-            color: my ? CupertinoColors.lightBackgroundGray : Colors.blue,
-            shadowColor: Colors.black,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-            child: Padding(
-              padding: const EdgeInsets.all(8),
-              child: Text(
-                text,
-                style: TextStyle(color: (my ? Colors.black : Colors.white)),
-                maxLines: 10,
+        Row(
+          mainAxisAlignment: my ? MainAxisAlignment.end : MainAxisAlignment.start,
+          children: [
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Card(
+                color: my
+                    ? ColorResources.accentRed
+                    : CupertinoColors.lightBackgroundGray,
+                shadowColor: Colors.black,
+                shape:
+                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        text,
+                        style: TextStyle(color: (my ? Colors.white : Colors.black)),
+                        maxLines: 10,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+
+        ...results.map(
+              (e) => Padding(
+            padding: const EdgeInsets.only(top: 4.0, left: 8),
+            child: Material(
+              color: ColorResources.accentRed,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              child: Container(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 16, horizontal: 16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        e,
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
         ),
+
+        const SizedBox(height: 8),
       ],
     );
   }
@@ -48,32 +86,65 @@ class _ChatState extends State<Chat> {
       child: Row(
         children: [
           IconButton(
-            icon: Icon(Icons.keyboard_voice_outlined,
-                color: ColorResources.darkGrey),
+            icon: const Icon(
+              Icons.keyboard_voice_outlined,
+              color: ColorResources.darkGrey,
+            ),
             onPressed: () {},
           ),
           Expanded(
             child: TextField(
               cursorColor: Colors.black,
+              onSubmitted: (String text) {
+                sendMessage(text);
+              },
               decoration: InputDecoration(
                 hintText: "Введите запрос...",
-                hintStyle: TextStyle(color: Colors.grey),
+                hintStyle: const TextStyle(color: Colors.grey),
                 fillColor: Colors.white,
                 filled: true,
                 border: OutlineInputBorder(
-                  borderSide: BorderSide(width: 0, style: BorderStyle.none),
+                  borderSide:
+                      const BorderSide(width: 0, style: BorderStyle.none),
                   borderRadius: BorderRadius.circular(10.0),
                 ),
               ),
             ),
           ),
           IconButton(
-            icon: Icon(Icons.send_rounded, color: ColorResources.darkGrey),
-            onPressed: () {},
+            icon:
+                const Icon(Icons.send_rounded, color: ColorResources.darkGrey),
+            onPressed: () {
+              sendMessage("Текст");
+            },
           ),
         ],
       ),
     );
+  }
+
+  void processResponse(String text) {
+    setState(() {
+      Chat._messages.add(const Message(
+          text: "Вот все, что удалось найти по вашему запросу:",
+          sentByUser: false,
+          results: [
+            "Список нормативных актов",
+            "Список органов контроля",
+            "Список обязательных требований"
+          ]));
+    });
+  }
+
+  void sendMessage(String text) {
+    setState(() {
+      Chat._messages.add(Message(
+        text: text,
+        sentByUser: true,
+        results: [],
+      ));
+      processResponse(text);
+    });
   }
 
   @override
@@ -89,36 +160,9 @@ class _ChatState extends State<Chat> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 verticalDirection: VerticalDirection.down,
                 children: [
-                  chatCard("Добрый день, с чем я могу вам помочь?", false),
-                  chatCard(
-                      "Здравствуйте, нужно согласовать очень длинный запрос: trpov pdsiofp sdpifpcv  pifdspofi psdifpoi iposdifpisd poidspofidpi psidpfip ipgisdpfi pisdpf",
-                      true),
-                  chatCard("Добрый день, с чем я могу вам помочь?", false),
-                  chatCard("Добрый день, с чем я могу вам помочь?", false),
-                  chatCard(
-                    "Здравствуйте, нужно согласовать очень длинный запрос: ",
-                    true,
-                  ),
-                  chatCard("Добрый день, с чем я могу вам помочь?", false),
-                  chatCard(
-                      "Здравствуйте, нужно согласовать очень длинный запрос: trpov pdsiofp sdpifpcv  pifdspofi psdifpoi iposdifpisd poidspofidpi psidpfip ipgisdpfi pisdpf",
-                      true),
-                  chatCard("Добрый день, с чем я могу вам помочь?", false),
-                  chatCard("Добрый день, с чем я могу вам помочь?", false),
-                  chatCard(
-                    "Здравствуйте, нужно согласовать очень длинный запрос: ",
-                    true,
-                  ),
-                  chatCard("Добрый день, с чем я могу вам помочь?", false),
-                  chatCard(
-                      "Здравствуйте, нужно согласовать очень длинный запрос: trpov pdsiofp sdpifpcv  pifdspofi psdifpoi iposdifpisd poidspofidpi psidpfip ipgisdpfi pisdpf",
-                      true),
-                  chatCard("Добрый день, с чем я могу вам помочь?", false),
-                  chatCard("Добрый день, с чем я могу вам помочь?", false),
-                  chatCard(
-                    "Здравствуйте, нужно согласовать очень длинный запрос: ",
-                    true,
-                  ),
+                  ...Chat._messages.map(
+                    (e) => chatCard(e.text, e.sentByUser, e.results),
+                  )
                 ],
               ),
             ),

@@ -1,0 +1,150 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+
+class Dashboard extends StatefulWidget {
+  const Dashboard({super.key});
+
+  @override
+  State<Dashboard> createState() => _DashboardState();
+}
+
+class _DashboardState extends State<Dashboard> {
+  @override
+  Widget build(BuildContext context) {
+    Widget dashboardCard(String text) {
+      return Material(
+        color: CupertinoColors.systemGrey6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Container(
+          width: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Text(text),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            verticalDirection: VerticalDirection.down,
+            children: [
+              Container(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Мероприятия",
+                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 32),
+                  ),
+                  IconButton(
+                    onPressed: () {},
+                    iconSize: 32,
+                    icon: const Icon(CupertinoIcons.profile_circled),
+                  ),
+                ],
+              ),
+              TextButton(onPressed: () {}, child: Text("Открыть календарь")),
+              Container(height: 32),
+              const Text(
+                "Календарь",
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+              ),
+              CalendarDatePicker(
+                firstDate: DateTime.parse("1900-01-01"),
+                lastDate: DateTime.parse("2300-12-31"),
+                initialDate: DateTime.now(),
+                onDateChanged: (DateTime dateTime) {},
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Ближайшие консультации",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                  ),
+                  SizedBox(width: 8),
+                  TextButton(onPressed: () {}, child: Text("Развернуть")),
+                ],
+              ),
+              SizedBox(height: 8),
+              dashboardCard("Текст встречи"),
+              SizedBox(height: 8),
+              dashboardCard("Текст встречи"),
+              SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Органы контроля",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                  ),
+                  SizedBox(width: 8),
+                  TextButton(onPressed: () {}, child: Text("Развернуть")),
+                ],
+              ),
+              SizedBox(height: 8),
+              dashboardCard("Орган контроля"),
+              SizedBox(height: 8),
+              dashboardCard("Орган контроля"),
+              SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Нормативные акты",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                  ),
+                  TextButton(onPressed: () {}, child: Text("Развернуть")),
+                ],
+              ),
+              SizedBox(height: 8),
+              dashboardCard("Нормативный акт"),
+              SizedBox(height: 8),
+              dashboardCard("Нормативный акт"),
+              SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "Обязательные требования",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                  ),
+                  SizedBox(width: 8),
+                  TextButton(onPressed: () {}, child: Text("Развернуть")),
+                ],
+              ),
+              SizedBox(height: 16),
+              dashboardCard("Обязательное требование"),
+              SizedBox(height: 8),
+              dashboardCard("Обязательное требование"),
+              SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text(
+                    "FAQ",
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                  ),
+                  SizedBox(width: 8),
+                  TextButton(onPressed: () {}, child: Text("Развернуть")),
+                ],
+              ),
+              SizedBox(height: 8),
+              dashboardCard("Вопрос в FAQ"),
+              SizedBox(height: 8),
+              dashboardCard("Вопрос в FAQ"),
+              SizedBox(height: 8),
+            ]),
+      ),
+    );
+  }
+}

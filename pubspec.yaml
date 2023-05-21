@@ -21,6 +21,8 @@ dev_dependencies:
   flutter_lints: ^2.0.0
   flutter_chat_ui: ^1.6.8
   agora_rtc_engine: ^6.1.1+1
+  speech_to_text: ^6.1.1
+  excel: 2.1.0
 
 flutter:
 

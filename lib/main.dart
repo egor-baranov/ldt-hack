@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/screens/account.dart';
 import 'package:lodt_hack/screens/login.dart';
+import 'package:lodt_hack/styles/ColorResources.dart';
 
 import 'screens/chat.dart';
 import 'screens/dashboard.dart';
@@ -45,6 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CupertinoColors.systemBackground,
+      // appBar: AppBar(toolbarHeight: 32),
       body: SafeArea(
           child: [
             Dashboard(onSearch: () {
@@ -59,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Account()
           ][_selectedIndex]),
       bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: CupertinoColors.black,
+        selectedItemColor: ColorResources.accentRed,
         unselectedItemColor: CupertinoColors.systemGrey,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

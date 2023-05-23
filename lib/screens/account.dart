@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../styles/ColorResources.dart';
+
 class Account extends StatefulWidget {
   const Account({super.key});
 
@@ -23,9 +25,14 @@ class _AccountState extends State<Account> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(type, style: TextStyle(color: CupertinoColors.systemGrey, fontSize: 14)),
+                Text(type,
+                    style: TextStyle(
+                        color: CupertinoColors.systemGrey, fontSize: 14)),
                 SizedBox(height: 8),
-                Text(text, style: TextStyle(fontWeight: FontWeight.w800),),
+                Text(
+                  text,
+                  style: TextStyle(fontWeight: FontWeight.w800),
+                ),
               ],
             ),
           ),
@@ -33,9 +40,9 @@ class _AccountState extends State<Account> {
       );
     }
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: SingleChildScrollView(
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,11 +53,20 @@ class _AccountState extends State<Account> {
                 "Профиль",
                 style: TextStyle(fontWeight: FontWeight.w900, fontSize: 32),
               ),
-              TextButton(onPressed: () {}, child: Text("Редактировать данные")),
+              TextButton(
+                onPressed: () {},
+                child: Text("Редактировать данные"),
+                style: ButtonStyle(
+                  foregroundColor:
+                      MaterialStateProperty.all(ColorResources.accentRed),
+                  overlayColor: MaterialStateProperty.all(
+                    ColorResources.accentRed.withOpacity(0.1),
+                  ),
+                ),
+              ),
               SizedBox(height: 16),
               accountCard("Род деятельности", "Предприниматель"),
               SizedBox(height: 32),
-
               const Text(
                 "Контактные данные",
                 style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
@@ -60,7 +76,6 @@ class _AccountState extends State<Account> {
               SizedBox(height: 8),
               accountCard("Адрес электронной почты", "hello@yandex.ru"),
               SizedBox(height: 32),
-
               const Text(
                 "Основные данные",
                 style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
@@ -82,7 +97,6 @@ class _AccountState extends State<Account> {
               SizedBox(height: 8),
               accountCard("Место рождения", "г. Москва"),
               SizedBox(height: 32),
-
               const Text(
                 "Паспортные данные",
                 style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),

@@ -1,3 +1,5 @@
+import 'dart:js_interop';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/main.dart';
@@ -11,8 +13,8 @@ class Login extends StatefulWidget {
 }
 
 class _LoginState extends State<Login> {
-
   bool useLogin = true;
+  bool isBusiness = true;
 
   Widget textField(String label) {
     return TextField(
@@ -59,17 +61,22 @@ class _LoginState extends State<Login> {
                   height: 40,
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorResources.accentRed),
+                      backgroundColor: MaterialStateProperty.all(isBusiness
+                          ? ColorResources.accentRed
+                          : CupertinoColors.secondarySystemFill),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        isBusiness = true;
+                      });
+                    },
                     child: const Text(
-                      "Орган контроля",
+                      "Бизнес",
                       style: TextStyle(fontSize: 14),
                     ),
                   ),
@@ -85,17 +92,22 @@ class _LoginState extends State<Login> {
                   height: 40,
                   child: ElevatedButton(
                     style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorResources.accentRed),
+                      backgroundColor: MaterialStateProperty.all(isBusiness
+                          ? CupertinoColors.secondarySystemFill
+                          : ColorResources.accentRed),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
                         ),
                       ),
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        isBusiness = false;
+                      });
+                    },
                     child: const Text(
-                      "Бизнес",
+                      "Орган контроля",
                       style: TextStyle(fontSize: 14),
                     ),
                   ),
@@ -108,26 +120,45 @@ class _LoginState extends State<Login> {
         textField("Адрес электронной почты"),
         SizedBox(height: 8),
         textField("Пароль"),
-
         Spacer(),
-        Row(
+        isBusiness ? Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text("Нет аккаунта?"),
-            TextButton(onPressed: () {
-              setState(() {
-                useLogin = false;
-              });
-            }, child: Text("Создать"))
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  useLogin = false;
+                });
+              },
+              child: Text("Создать"),
+              style: ButtonStyle(
+                foregroundColor:
+                    MaterialStateProperty.all(ColorResources.accentRed),
+                overlayColor: MaterialStateProperty.all(
+                  ColorResources.accentRed.withOpacity(0.1),
+                ),
+              ),
+            )
           ],
-        ),
-        Row(
+        ) : SizedBox(),
+        isBusiness ? Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text("Забыли пароль?"),
-            TextButton(onPressed: () {}, child: Text("Восстановить"))
+            TextButton(
+              onPressed: () {},
+              child: Text("Восстановить"),
+              style: ButtonStyle(
+                foregroundColor:
+                    MaterialStateProperty.all(ColorResources.accentRed),
+                overlayColor: MaterialStateProperty.all(
+                  ColorResources.accentRed.withOpacity(0.1),
+                ),
+              ),
+            )
           ],
-        ),
+        ) : SizedBox(),
         SizedBox(height: 8),
         Container(
           height: 48,
@@ -170,7 +201,7 @@ class _LoginState extends State<Login> {
           ),
           SizedBox(height: 8),
           const Text(
-            "Заполните данные для создания аккаунта, если вы бизнес",
+            "Заполните данные для создания аккаунта, если вы — бизнес",
             style: TextStyle(fontWeight: FontWeight.w300, fontSize: 16),
           ),
           SizedBox(height: 32),
@@ -235,6 +266,13 @@ class _LoginState extends State<Login> {
                   });
                 },
                 child: Text("Войти"),
+                style: ButtonStyle(
+                  foregroundColor:
+                      MaterialStateProperty.all(ColorResources.accentRed),
+                  overlayColor: MaterialStateProperty.all(
+                    ColorResources.accentRed.withOpacity(0.1),
+                  ),
+                ),
               )
             ],
           ),
@@ -269,7 +307,6 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       backgroundColor: CupertinoColors.systemBackground,
       body: SafeArea(

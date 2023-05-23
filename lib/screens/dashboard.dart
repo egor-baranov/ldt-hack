@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../styles/ColorResources.dart';
+
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key, required this.onSearch});
 
@@ -48,14 +50,33 @@ class _DashboardState extends State<Dashboard> {
                     style: TextStyle(fontWeight: FontWeight.w900, fontSize: 32),
                   ),
                   IconButton(
-                    onPressed: () { widget.onSearch(); },
+                    onPressed: () {
+                      widget.onSearch();
+                    },
                     iconSize: 28,
                     color: CupertinoColors.darkBackgroundGray,
                     icon: const Icon(CupertinoIcons.search),
                   ),
                 ],
               ),
-              TextButton(onPressed: () {}, child: Text("Открыть календарь")),
+              TextButton(
+                onPressed: () {
+                  showDatePicker(
+                    context: context,
+                    firstDate: DateTime.parse("1900-01-01"),
+                    lastDate: DateTime.parse("2300-12-31"),
+                    initialDate: DateTime.now(),
+                  );
+                },
+                child: Text("Открыть календарь"),
+                style: ButtonStyle(
+                  foregroundColor:
+                      MaterialStateProperty.all(ColorResources.accentRed),
+                  overlayColor: MaterialStateProperty.all(
+                    ColorResources.accentRed.withOpacity(0.1),
+                  ),
+                ),
+              ),
               Container(height: 32),
               const Text(
                 "Календарь",
@@ -75,7 +96,17 @@ class _DashboardState extends State<Dashboard> {
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
                   ),
                   SizedBox(width: 8),
-                  TextButton(onPressed: () {}, child: Text("Развернуть")),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text("Развернуть"),
+                    style: ButtonStyle(
+                      foregroundColor:
+                          MaterialStateProperty.all(ColorResources.accentRed),
+                      overlayColor: MaterialStateProperty.all(
+                        ColorResources.accentRed.withOpacity(0.1),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 8),
@@ -91,7 +122,17 @@ class _DashboardState extends State<Dashboard> {
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
                   ),
                   SizedBox(width: 8),
-                  TextButton(onPressed: () {}, child: Text("Развернуть")),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text("Развернуть"),
+                    style: ButtonStyle(
+                      foregroundColor:
+                          MaterialStateProperty.all(ColorResources.accentRed),
+                      overlayColor: MaterialStateProperty.all(
+                        ColorResources.accentRed.withOpacity(0.1),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 8),
@@ -106,7 +147,17 @@ class _DashboardState extends State<Dashboard> {
                     "Нормативные акты",
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
                   ),
-                  TextButton(onPressed: () {}, child: Text("Развернуть")),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text("Развернуть"),
+                    style: ButtonStyle(
+                      foregroundColor:
+                          MaterialStateProperty.all(ColorResources.accentRed),
+                      overlayColor: MaterialStateProperty.all(
+                        ColorResources.accentRed.withOpacity(0.1),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 8),
@@ -122,7 +173,17 @@ class _DashboardState extends State<Dashboard> {
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
                   ),
                   SizedBox(width: 8),
-                  TextButton(onPressed: () {}, child: Text("Развернуть")),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text("Развернуть"),
+                    style: ButtonStyle(
+                      foregroundColor:
+                          MaterialStateProperty.all(ColorResources.accentRed),
+                      overlayColor: MaterialStateProperty.all(
+                        ColorResources.accentRed.withOpacity(0.1),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 16),
@@ -138,7 +199,17 @@ class _DashboardState extends State<Dashboard> {
                     style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
                   ),
                   SizedBox(width: 8),
-                  TextButton(onPressed: () {}, child: Text("Развернуть")),
+                  TextButton(
+                    onPressed: () {},
+                    child: Text("Развернуть"),
+                    style: ButtonStyle(
+                      foregroundColor:
+                          MaterialStateProperty.all(ColorResources.accentRed),
+                      overlayColor: MaterialStateProperty.all(
+                        ColorResources.accentRed.withOpacity(0.1),
+                      ),
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 8),

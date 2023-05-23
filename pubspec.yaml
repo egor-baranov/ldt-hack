@@ -23,6 +23,7 @@ dev_dependencies:
   agora_rtc_engine: ^6.1.1+1
   speech_to_text: ^6.1.1
   excel: 2.1.0
+  permission_handler: ^10.2.0
 
 flutter:
 

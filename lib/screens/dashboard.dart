@@ -62,6 +62,23 @@ class _DashboardState extends State<Dashboard> {
               TextButton(
                 onPressed: () {
                   showDatePicker(
+                    builder: (context, child) {
+                      return Theme(
+                        data: Theme.of(context).copyWith(
+                          colorScheme: const ColorScheme.light(
+                            primary: ColorResources.accentRed,
+                            onPrimary: Colors.white,
+                            onSurface: Colors.black,
+                          ),
+                          textButtonTheme: TextButtonThemeData(
+                            style: TextButton.styleFrom(
+                              foregroundColor: ColorResources.accentRed,
+                            ),
+                          ),
+                        ),
+                        child: child!,
+                      );
+                    },
                     context: context,
                     firstDate: DateTime.parse("1900-01-01"),
                     lastDate: DateTime.parse("2300-12-31"),

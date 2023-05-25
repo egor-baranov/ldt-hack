@@ -3,6 +3,7 @@ import 'dart:js_interop';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/main.dart';
+import 'package:lodt_hack/screens/forgot_email.dart';
 import 'package:lodt_hack/styles/ColorResources.dart';
 
 class Login extends StatefulWidget {
@@ -147,7 +148,12 @@ class _LoginState extends State<Login> {
           children: [
             Text("Забыли пароль?"),
             TextButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ForgotEmail()),
+                );
+              },
               child: Text("Восстановить"),
               style: ButtonStyle(
                 foregroundColor:

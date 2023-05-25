@@ -6,6 +6,7 @@ import 'ColorResources.dart';
 import 'TextStyles.dart';
 
 final light = ThemeData(
+  primaryColorDark: ColorResources.accentRed,
   appBarTheme: const AppBarTheme(
     backgroundColor: ColorResources.lightGrey,
     foregroundColor: ColorResources.black,

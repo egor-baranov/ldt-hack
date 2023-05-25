@@ -1,5 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:lodt_hack/utils/calendar.dart';
 
 import '../styles/ColorResources.dart';
 
@@ -13,6 +15,10 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  List<DateTime?> _singleDatePickerValueWithDefaultValue = [
+    DateTime.now(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     Widget dashboardCard(String text) {
@@ -99,11 +105,12 @@ class _DashboardState extends State<Dashboard> {
                 "Календарь",
                 style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
               ),
-              CalendarDatePicker(
-                firstDate: DateTime.parse("1900-01-01"),
-                lastDate: DateTime.parse("2300-12-31"),
-                initialDate: DateTime.now(),
-                onDateChanged: (DateTime dateTime) {},
+              CalendarDatePicker2(
+                config: calendarConfig,
+                value: _singleDatePickerValueWithDefaultValue,
+                onValueChanged: (dates) => setState(
+                      () => _singleDatePickerValueWithDefaultValue = dates,
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

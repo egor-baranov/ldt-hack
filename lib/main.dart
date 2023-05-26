@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/screens/account.dart';
-import 'package:lodt_hack/screens/login.dart';
+import 'package:lodt_hack/screens/auth/auth.dart';
 import 'package:lodt_hack/styles/ColorResources.dart';
 
 import 'screens/chat.dart';
@@ -52,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Dashboard(onSearch: () {
               setState(() {
                 Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => Login()),
+                  MaterialPageRoute(builder: (context) => Auth()),
                 );
               });
             }),

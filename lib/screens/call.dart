@@ -4,8 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
-import 'package:flutter/material.dart';
-import 'package:lodt_hack/styles/ColorResources.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:agora_uikit/agora_uikit.dart';
@@ -20,9 +18,6 @@ class Call extends StatefulWidget {
 class _CallState extends State<Call> {
   int? _remoteUid;
   bool _localUserJoined = false;
-
-  bool _camEnabled = false;
-  bool _micEnabled = false;
 
   late RtcEngine _engine;
 
@@ -153,135 +148,6 @@ class _CallState extends State<Call> {
               ),
             ],
           ),
-          // child: Column(
-          //   mainAxisAlignment: MainAxisAlignment.start,
-          //   crossAxisAlignment: CrossAxisAlignment.start,
-          //   verticalDirection: VerticalDirection.down,
-          //   children: [
-          //     Text(
-          //       "Консультация с инспектором",
-          //       style: GoogleFonts.ptSerif(fontSize: 32),
-          //     ),
-          //     SizedBox(height: 16),
-          //     const Text(
-          //       "Мерзляков Василий Викторович",
-          //       style: TextStyle(
-          //         fontSize: 18,
-          //         fontWeight: FontWeight.w400,
-          //       ),
-          //     ),
-          //     Spacer(),
-          //     SizedBox(
-          //       width: double.infinity,
-          //       height: 500,
-          //       child: _localUserJoined
-          //           ? AgoraVideoView(
-          //               controller: VideoViewController(
-          //                 rtcEngine: _engine,
-          //                 canvas: const VideoCanvas(uid: 0),
-          //               ),
-          //             )
-          //           : const CircularProgressIndicator(),
-          //     ),
-          //     Spacer(),
-          //     Row(
-          //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //       children: [
-          //         ElevatedButton(
-          //           onPressed: () {},
-          //           style: ButtonStyle(
-          //               backgroundColor: MaterialStateProperty.all(
-          //                 ColorResources.accentRed,
-          //               ),
-          //               padding:
-          //                   MaterialStateProperty.all(const EdgeInsets.all(12)),
-          //               shape: MaterialStateProperty.all(const CircleBorder())),
-          //           child: const Icon(
-          //             Icons.chat_rounded,
-          //             color: Colors.white,
-          //             size: 24,
-          //           ),
-          //         ),
-          //         ElevatedButton(
-          //           onPressed: () {
-          //             setState(() {
-          //               _micEnabled = !_micEnabled;
-          //             });
-          //           },
-          //           style: ButtonStyle(
-          //               backgroundColor: MaterialStateProperty.all(
-          //                 _micEnabled
-          //                     ? ColorResources.accentRed
-          //                     : ColorResources.darkGrey,
-          //               ),
-          //               padding:
-          //                   MaterialStateProperty.all(const EdgeInsets.all(12)),
-          //               shape: MaterialStateProperty.all(const CircleBorder())),
-          //           child: const Icon(
-          //             Icons.keyboard_voice,
-          //             color: Colors.white,
-          //             size: 24,
-          //           ),
-          //         ),
-          //         ElevatedButton(
-          //           onPressed: () {
-          //             Navigator.of(context).pop();
-          //           },
-          //           style: ButtonStyle(
-          //               backgroundColor: MaterialStateProperty.all(
-          //                 ColorResources.accentRed,
-          //               ),
-          //               padding:
-          //                   MaterialStateProperty.all(const EdgeInsets.all(12)),
-          //               shape: MaterialStateProperty.all(const CircleBorder())),
-          //           child: const Icon(
-          //             Icons.call_end_rounded,
-          //             color: Colors.white,
-          //             size: 24,
-          //           ),
-          //         ),
-          //         ElevatedButton(
-          //           onPressed: () {
-          //             setState(() {
-          //               _camEnabled = !_camEnabled;
-          //             });
-          //           },
-          //           style: ButtonStyle(
-          //               backgroundColor: MaterialStateProperty.all(
-          //                 _camEnabled
-          //                     ? ColorResources.accentRed
-          //                     : ColorResources.darkGrey,
-          //               ),
-          //               padding:
-          //                   MaterialStateProperty.all(const EdgeInsets.all(12)),
-          //               shape: MaterialStateProperty.all(const CircleBorder())),
-          //           child: Icon(
-          //             _camEnabled
-          //                 ? Icons.videocam_rounded
-          //                 : Icons.videocam_off_rounded,
-          //             color: Colors.white,
-          //             size: 24,
-          //           ),
-          //         ),
-          //         ElevatedButton(
-          //           onPressed: () {},
-          //           style: ButtonStyle(
-          //               backgroundColor: MaterialStateProperty.all(
-          //                 ColorResources.accentRed,
-          //               ),
-          //               padding:
-          //                   MaterialStateProperty.all(const EdgeInsets.all(12)),
-          //               shape: MaterialStateProperty.all(const CircleBorder())),
-          //           child: const Icon(
-          //             Icons.more_horiz_rounded,
-          //             color: Colors.white,
-          //             size: 24,
-          //           ),
-          //         ),
-          //       ],
-          //     ),
-          //   ],
-          // ),
         ),
       ),
     );

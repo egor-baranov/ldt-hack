@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:lodt_hack/main.dart';
 import 'package:lodt_hack/styles/ColorResources.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -95,7 +94,7 @@ class _ConsultationState extends State<Consultation> {
                         MaterialPageRoute(builder: (context) => Call()),
                       );
                     },
-                    child: Text("Подключиться к консультации"),
+                    child: Text("Подключиться"),
                   ),
                 ),
                 SizedBox(height: 8),

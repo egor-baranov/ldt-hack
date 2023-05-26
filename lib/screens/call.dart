@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -26,7 +28,7 @@ class _CallState extends State<Call> {
 
   final AgoraClient client = AgoraClient(
     agoraConnectionData: AgoraConnectionData(
-      username: "kepler88d",
+      username: "user" + Random.secure().nextInt(1000).toString(),
       appId: "faa5e42e20664f2e8090edd45ae9b1a6",
       channelName: "test",
       tempToken: "007eJxTYCjcJSPG+XrL3DuJcdutN3E+neHUL6C6eWaJ88x5K7QT79srMKQlJpqmmhilGhmYmZmkGaVaGFgapKakmJgmplomGSaa1aUUpDQEMjJM1YlgZmSAQBCfhaEktbiEgQEAGOMelA==",

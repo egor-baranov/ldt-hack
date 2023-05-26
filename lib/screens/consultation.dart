@@ -87,16 +87,8 @@ class _ConsultationState extends State<Consultation> {
                 Container(
                   height: 48,
                   width: double.infinity,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorResources.accentRed),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                    ),
+                  child: CupertinoButton(
+                    color: ColorResources.accentRed,
                     onPressed: () {
                       Navigator.push(
                         context,
@@ -110,22 +102,17 @@ class _ConsultationState extends State<Consultation> {
                 Container(
                   height: 48,
                   width: double.infinity,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                      backgroundColor:
-                          MaterialStateProperty.all(ColorResources.accentPink),
-                      foregroundColor:
-                          MaterialStateProperty.all(ColorResources.accentRed),
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                    ),
+                  child: CupertinoButton(
+                    color: ColorResources.accentPink,
                     onPressed: () {
                       Navigator.pop(context);
                     },
-                    child: Text("Отменить консультацию"),
+                    child: const Text(
+                      "Отменить консультацию",
+                      style: TextStyle(
+                        color: ColorResources.accentRed,
+                      ),
+                    ),
                   ),
                 ),
                 SizedBox(height: 16),

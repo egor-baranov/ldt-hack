@@ -25,13 +25,17 @@ class _AccountState extends State<Account> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(type,
-                    style: TextStyle(
-                        color: CupertinoColors.systemGrey, fontSize: 14)),
+                Text(
+                  type,
+                  style: TextStyle(
+                    color: CupertinoColors.systemGrey,
+                    fontSize: 14,
+                  ),
+                ),
                 SizedBox(height: 8),
                 Text(
                   text,
-                  style: TextStyle(fontWeight: FontWeight.w800),
+                  style: GoogleFonts.inter(fontSize: 14),
                 ),
               ],
             ),

@@ -45,7 +45,9 @@ class _CreateConsultationState extends State<CreateConsultation> {
                 SizedBox(height: 16),
                 Text(
                   "Запись на консультацию",
-                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 32),
+                  style: GoogleFonts.ptSerif(
+                    fontSize: 32,
+                  ),
                 ),
                 SizedBox(height: 8),
                 const Text(

@@ -27,13 +27,15 @@ class _ConsultationState extends State<Consultation> {
             children: [
               Text(
                 type,
-                style:
-                    TextStyle(color: CupertinoColors.systemGrey, fontSize: 14),
+                style: GoogleFonts.inter(
+                  fontSize: 14,
+                  color: CupertinoColors.systemGrey,
+                ),
               ),
               SizedBox(height: 8),
               Text(
                 text,
-                style: TextStyle(fontWeight: FontWeight.w800),
+                style: GoogleFonts.inter(fontSize: 14),
               ),
             ],
           ),

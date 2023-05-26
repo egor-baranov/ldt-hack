@@ -14,12 +14,16 @@ class Chat extends StatefulWidget {
 }
 
 class _ChatState extends State<Chat> {
+
+  final _inputController = TextEditingController();
+
   Widget chatCard(String text, bool my, List<String> results) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          mainAxisAlignment: my ? MainAxisAlignment.end : MainAxisAlignment.start,
+          mainAxisAlignment:
+              my ? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
             ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 400),
@@ -28,8 +32,8 @@ class _ChatState extends State<Chat> {
                     ? ColorResources.accentRed
                     : CupertinoColors.lightBackgroundGray,
                 shadowColor: Colors.black,
-                shape:
-                    RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Column(
@@ -37,7 +41,8 @@ class _ChatState extends State<Chat> {
                     children: [
                       Text(
                         text,
-                        style: TextStyle(color: (my ? Colors.white : Colors.black)),
+                        style: TextStyle(
+                            color: (my ? Colors.white : Colors.black)),
                         maxLines: 10,
                       ),
                     ],
@@ -47,9 +52,8 @@ class _ChatState extends State<Chat> {
             ),
           ],
         ),
-
         ...results.map(
-              (e) => Padding(
+          (e) => Padding(
             padding: const EdgeInsets.only(top: 4.0, left: 8),
             child: Material(
               color: ColorResources.accentRed,
@@ -57,8 +61,8 @@ class _ChatState extends State<Chat> {
                   borderRadius: BorderRadius.circular(16)),
               child: Container(
                 child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 16, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -73,7 +77,6 @@ class _ChatState extends State<Chat> {
             ),
           ),
         ),
-
         const SizedBox(height: 8),
       ],
     );
@@ -94,9 +97,11 @@ class _ChatState extends State<Chat> {
           ),
           Expanded(
             child: TextField(
+              controller: _inputController,
               cursorColor: Colors.black,
               onSubmitted: (String text) {
                 sendMessage(text);
+                _inputController.clear();
               },
               decoration: InputDecoration(
                 hintText: "Введите запрос...",
@@ -115,7 +120,10 @@ class _ChatState extends State<Chat> {
             icon:
                 const Icon(Icons.send_rounded, color: ColorResources.darkGrey),
             onPressed: () {
-              sendMessage("Текст");
+              if (_inputController.text.isNotEmpty) {
+                sendMessage(_inputController.text);
+                _inputController.clear();
+              }
             },
           ),
         ],

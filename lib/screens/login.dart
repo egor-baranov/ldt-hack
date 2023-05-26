@@ -1,10 +1,9 @@
-import 'dart:js_interop';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/main.dart';
 import 'package:lodt_hack/screens/forgot_email.dart';
 import 'package:lodt_hack/styles/ColorResources.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -41,9 +40,9 @@ class _LoginState extends State<Login> {
       verticalDirection: VerticalDirection.down,
       children: [
         SizedBox(height: 16),
-        const Text(
+        Text(
           "Вход в личный кабинет",
-          style: TextStyle(fontWeight: FontWeight.w900, fontSize: 32),
+          style: GoogleFonts.ptSerif(fontSize: 32),
         ),
         SizedBox(height: 8),
         const Text(
@@ -58,7 +57,7 @@ class _LoginState extends State<Login> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 180,
+                  width: 160,
                   height: 40,
                   child: ElevatedButton(
                     style: ButtonStyle(
@@ -89,7 +88,7 @@ class _LoginState extends State<Login> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  width: 180,
+                  width: 160,
                   height: 40,
                   child: ElevatedButton(
                     style: ButtonStyle(
@@ -122,49 +121,53 @@ class _LoginState extends State<Login> {
         SizedBox(height: 8),
         textField("Пароль"),
         Spacer(),
-        isBusiness ? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Нет аккаунта?"),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  useLogin = false;
-                });
-              },
-              child: Text("Создать"),
-              style: ButtonStyle(
-                foregroundColor:
-                    MaterialStateProperty.all(ColorResources.accentRed),
-                overlayColor: MaterialStateProperty.all(
-                  ColorResources.accentRed.withOpacity(0.1),
-                ),
-              ),
-            )
-          ],
-        ) : SizedBox(),
-        isBusiness ? Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("Забыли пароль?"),
-            TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ForgotEmail()),
-                );
-              },
-              child: Text("Восстановить"),
-              style: ButtonStyle(
-                foregroundColor:
-                    MaterialStateProperty.all(ColorResources.accentRed),
-                overlayColor: MaterialStateProperty.all(
-                  ColorResources.accentRed.withOpacity(0.1),
-                ),
-              ),
-            )
-          ],
-        ) : SizedBox(),
+        isBusiness
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Нет аккаунта?"),
+                  TextButton(
+                    onPressed: () {
+                      setState(() {
+                        useLogin = false;
+                      });
+                    },
+                    child: Text("Создать"),
+                    style: ButtonStyle(
+                      foregroundColor:
+                          MaterialStateProperty.all(ColorResources.accentRed),
+                      overlayColor: MaterialStateProperty.all(
+                        ColorResources.accentRed.withOpacity(0.1),
+                      ),
+                    ),
+                  )
+                ],
+              )
+            : SizedBox(),
+        isBusiness
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Забыли пароль?"),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => ForgotEmail()),
+                      );
+                    },
+                    child: Text("Восстановить"),
+                    style: ButtonStyle(
+                      foregroundColor:
+                          MaterialStateProperty.all(ColorResources.accentRed),
+                      overlayColor: MaterialStateProperty.all(
+                        ColorResources.accentRed.withOpacity(0.1),
+                      ),
+                    ),
+                  )
+                ],
+              )
+            : SizedBox(),
         SizedBox(height: 8),
         Container(
           height: 48,
@@ -201,9 +204,9 @@ class _LoginState extends State<Login> {
         verticalDirection: VerticalDirection.down,
         children: [
           SizedBox(height: 16),
-          const Text(
+          Text(
             "Регистрация",
-            style: TextStyle(fontWeight: FontWeight.w900, fontSize: 32),
+            style: GoogleFonts.ptSerif(fontSize: 32),
           ),
           SizedBox(height: 8),
           const Text(
@@ -212,9 +215,9 @@ class _LoginState extends State<Login> {
           ),
           SizedBox(height: 32),
 
-          const Text(
+          Text(
             "Контактные данные",
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+            style: GoogleFonts.ptSerif(fontSize: 24),
           ),
           SizedBox(height: 8),
           textField("Телефон"),
@@ -222,9 +225,9 @@ class _LoginState extends State<Login> {
           textField("Адрес электронной почты"),
           SizedBox(height: 32),
           //
-          const Text(
+          Text(
             "Основные данные",
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+            style: GoogleFonts.ptSerif(fontSize: 24),
           ),
           SizedBox(height: 8),
           textField("Фамилия"),
@@ -244,9 +247,9 @@ class _LoginState extends State<Login> {
           textField("Место рождения"),
           SizedBox(height: 32),
           //
-          const Text(
+          Text(
             "Паспортные данные",
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+            style: GoogleFonts.ptSerif(fontSize: 24),
           ),
           SizedBox(height: 8),
           textField("Серия"),

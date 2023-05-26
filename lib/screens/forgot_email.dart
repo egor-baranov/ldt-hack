@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/main.dart';
 import 'package:lodt_hack/styles/ColorResources.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ForgotEmail extends StatefulWidget {
   const ForgotEmail({super.key});
@@ -44,7 +45,7 @@ class _ForgotEmailState extends State<ForgotEmail> {
                 SizedBox(height: 16),
                 Text(
                   "Восстановление пароля",
-                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 32),
+                  style: GoogleFonts.ptSerif(fontSize: 24),
                 ),
                 SizedBox(height: 8),
                 const Text(
@@ -60,7 +61,7 @@ class _ForgotEmailState extends State<ForgotEmail> {
                   child: ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor:
-                      MaterialStateProperty.all(ColorResources.accentRed),
+                          MaterialStateProperty.all(ColorResources.accentRed),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),
@@ -80,9 +81,9 @@ class _ForgotEmailState extends State<ForgotEmail> {
                   child: ElevatedButton(
                     style: ButtonStyle(
                       backgroundColor:
-                      MaterialStateProperty.all(ColorResources.accentPink),
+                          MaterialStateProperty.all(ColorResources.accentPink),
                       foregroundColor:
-                      MaterialStateProperty.all(ColorResources.accentRed),
+                          MaterialStateProperty.all(ColorResources.accentRed),
                       shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10.0),

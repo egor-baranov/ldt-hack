@@ -12,7 +12,7 @@ class ColorResources {
   static const lightGrey = Color(0xFFF9F9F9);
   static const white = Color(0xFFFFFFFF);
 
-  static const accentRed = Color(0xFFED543F);
+  static const accentRed = Color(0xFFF64027);
   static const accentPink = Color(0xFFFFF5F2);
   static const accentGrey = Color(0xFFF7F7F7);
 }

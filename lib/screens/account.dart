@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../styles/ColorResources.dart';
 
@@ -13,7 +14,6 @@ class Account extends StatefulWidget {
 class _AccountState extends State<Account> {
   @override
   Widget build(BuildContext context) {
-
     Widget accountCard(String type, String text) {
       return Material(
         color: CupertinoColors.systemGrey6,
@@ -49,9 +49,9 @@ class _AccountState extends State<Account> {
             verticalDirection: VerticalDirection.down,
             children: [
               SizedBox(height: 16),
-              const Text(
+              Text(
                 "Профиль",
-                style: TextStyle(fontWeight: FontWeight.w900, fontSize: 32),
+                style: GoogleFonts.ptSerif(fontSize: 32),
               ),
               TextButton(
                 onPressed: () {},
@@ -67,18 +67,18 @@ class _AccountState extends State<Account> {
               SizedBox(height: 16),
               accountCard("Род деятельности", "Предприниматель"),
               SizedBox(height: 32),
-              const Text(
+              Text(
                 "Контактные данные",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                style: GoogleFonts.ptSerif(fontSize: 24),
               ),
               SizedBox(height: 8),
               accountCard("Телефон", "+79776661234"),
               SizedBox(height: 8),
               accountCard("Адрес электронной почты", "hello@yandex.ru"),
               SizedBox(height: 32),
-              const Text(
+              Text(
                 "Основные данные",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                style: GoogleFonts.ptSerif(fontSize: 24),
               ),
               SizedBox(height: 8),
               accountCard("Фамилия", "Антонов"),
@@ -97,9 +97,9 @@ class _AccountState extends State<Account> {
               SizedBox(height: 8),
               accountCard("Место рождения", "г. Москва"),
               SizedBox(height: 32),
-              const Text(
+              Text(
                 "Паспортные данные",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                style: GoogleFonts.ptSerif(fontSize: 24),
               ),
               SizedBox(height: 8),
               accountCard("Серия", "4321"),

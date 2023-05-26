@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/main.dart';
 import 'package:lodt_hack/styles/ColorResources.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'call.dart';
 
@@ -55,9 +56,9 @@ class _ConsultationState extends State<Consultation> {
               verticalDirection: VerticalDirection.down,
               children: [
                 SizedBox(height: 16),
-                const Text(
+                Text(
                   "Консультация",
-                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 32),
+                  style: GoogleFonts.ptSerif(fontSize: 32),
                 ),
                 TextButton(
                   onPressed: () {},

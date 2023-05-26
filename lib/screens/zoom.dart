@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/screens/create_consultation.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../models/Message.dart';
 import '../styles/ColorResources.dart';
@@ -72,9 +73,9 @@ class _ZoomState extends State<Zoom> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "Консультации",
-                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 32),
+                    style: GoogleFonts.ptSerif(fontSize: 32),
                   ),
                   IconButton(
                     iconSize: 28,
@@ -126,36 +127,36 @@ class _ZoomState extends State<Zoom> {
                 ),
               ),
               SizedBox(height: 16),
-              const Text(
+              Text(
                 "Сегодня",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                style: GoogleFonts.ptSerif(fontSize: 24),
               ),
               SizedBox(height: 8),
               zoomCard("Обсуждение нормативных актов и их влияния на бизнес", "24.03", "15:00"),
               SizedBox(height: 8),
               zoomCard("Обсуждение нормативных актов и их влияния на бизнес", "24.03", "15:00"),
               SizedBox(height: 16),
-              const Text(
+              Text(
                 "Вчера",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                style: GoogleFonts.ptSerif(fontSize: 24),
               ),
               SizedBox(height: 8),
               zoomCard("Обсуждение нормативных актов и их влияния на бизнес", "24.03", "15:00"),
               SizedBox(height: 8),
               zoomCard("Обсуждение нормативных актов и их влияния на бизнес", "24.03", "15:00"),
               SizedBox(height: 16),
-              const Text(
+              Text(
                 "19 мая",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                style: GoogleFonts.ptSerif(fontSize: 24),
               ),
               SizedBox(height: 8),
               zoomCard("Обсуждение нормативных актов и их влияния на бизнес", "24.03", "15:00"),
               SizedBox(height: 8),
               zoomCard("Обсуждение нормативных актов и их влияния на бизнес", "24.03", "15:00"),
               SizedBox(height: 16),
-              const Text(
+              Text(
                 "12 мая",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                style: GoogleFonts.ptSerif(fontSize: 24),
               ),
               SizedBox(height: 8),
               zoomCard("Обсуждение нормативных актов и их влияния на бизнес", "24.03", "15:00"),

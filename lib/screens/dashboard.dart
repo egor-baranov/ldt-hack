@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:lodt_hack/utils/calendar.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../styles/ColorResources.dart';
 
@@ -51,9 +52,9 @@ class _DashboardState extends State<Dashboard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "Главная",
-                    style: TextStyle(fontWeight: FontWeight.w900, fontSize: 32),
+                    style: GoogleFonts.ptSerif(fontSize: 32),
                   ),
                   IconButton(
                     onPressed: () {
@@ -101,28 +102,27 @@ class _DashboardState extends State<Dashboard> {
                 ),
               ),
               Container(height: 32),
-              const Text(
+              Text(
                 "Календарь",
-                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                style: GoogleFonts.ptSerif(fontSize: 24),
               ),
               CalendarDatePicker2(
                 config: calendarConfig,
                 value: _singleDatePickerValueWithDefaultValue,
                 onValueChanged: (dates) => setState(
-                      () => _singleDatePickerValueWithDefaultValue = dates,
+                  () => _singleDatePickerValueWithDefaultValue = dates,
                 ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "Ближайшие консультации",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                    style: GoogleFonts.ptSerif(fontSize: 24),
                   ),
-                  SizedBox(width: 8),
                   TextButton(
                     onPressed: () {},
-                    child: Text("Развернуть"),
+                    child: Icon(Icons.expand_more_rounded, size: 24),
                     style: ButtonStyle(
                       foregroundColor:
                           MaterialStateProperty.all(ColorResources.accentRed),
@@ -141,14 +141,13 @@ class _DashboardState extends State<Dashboard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "Органы контроля",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                    style: GoogleFonts.ptSerif(fontSize: 24),
                   ),
-                  SizedBox(width: 8),
                   TextButton(
                     onPressed: () {},
-                    child: Text("Развернуть"),
+                    child: Icon(Icons.expand_more_rounded, size: 24),
                     style: ButtonStyle(
                       foregroundColor:
                           MaterialStateProperty.all(ColorResources.accentRed),
@@ -167,13 +166,13 @@ class _DashboardState extends State<Dashboard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "Нормативные акты",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                    style: GoogleFonts.ptSerif(fontSize: 24),
                   ),
                   TextButton(
                     onPressed: () {},
-                    child: Text("Развернуть"),
+                    child: Icon(Icons.expand_more_rounded, size: 24),
                     style: ButtonStyle(
                       foregroundColor:
                           MaterialStateProperty.all(ColorResources.accentRed),
@@ -192,14 +191,13 @@ class _DashboardState extends State<Dashboard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "Обязательные требования",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                    style: GoogleFonts.ptSerif(fontSize: 24),
                   ),
-                  SizedBox(width: 8),
                   TextButton(
                     onPressed: () {},
-                    child: Text("Развернуть"),
+                    child: Icon(Icons.expand_more_rounded, size: 24),
                     style: ButtonStyle(
                       foregroundColor:
                           MaterialStateProperty.all(ColorResources.accentRed),
@@ -218,14 +216,13 @@ class _DashboardState extends State<Dashboard> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text(
+                  Text(
                     "FAQ",
-                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 24),
+                    style: GoogleFonts.ptSerif(fontSize: 24),
                   ),
-                  SizedBox(width: 8),
                   TextButton(
                     onPressed: () {},
-                    child: Text("Развернуть"),
+                    child: Icon(Icons.expand_more_rounded, size: 24),
                     style: ButtonStyle(
                       foregroundColor:
                           MaterialStateProperty.all(ColorResources.accentRed),

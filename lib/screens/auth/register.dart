@@ -6,6 +6,11 @@ import 'package:google_fonts/google_fonts.dart';
 
 
 class Register extends StatefulWidget {
+
+  final Function onChangeFlow;
+
+  const Register({super.key, required this.onChangeFlow});
+
   @override
   State<Register> createState() => _RegisterState();
 }
@@ -31,110 +36,120 @@ class _RegisterState extends State<Register> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        verticalDirection: VerticalDirection.down,
-        children: [
-          SizedBox(height: 16),
-          Text(
-            "Регистрация",
-            style: GoogleFonts.ptSerif(fontSize: 32),
-          ),
-          SizedBox(height: 8),
-          const Text(
-            "Заполните данные для создания аккаунта, если вы — бизнес",
-            style: TextStyle(fontWeight: FontWeight.w300, fontSize: 16),
-          ),
-          SizedBox(height: 32),
-
-          Text(
-            "Контактные данные",
-            style: GoogleFonts.ptSerif(fontSize: 24),
-          ),
-          SizedBox(height: 8),
-          textField("Телефон"),
-          SizedBox(height: 8),
-          textField("Адрес электронной почты"),
-          SizedBox(height: 32),
-          //
-          Text(
-            "Основные данные",
-            style: GoogleFonts.ptSerif(fontSize: 24),
-          ),
-          SizedBox(height: 8),
-          textField("Фамилия"),
-          SizedBox(height: 8),
-          textField("Имя"),
-          SizedBox(height: 8),
-          textField("Отчество"),
-          SizedBox(height: 8),
-          textField("ИНН"),
-          SizedBox(height: 8),
-          textField("СНИЛС"),
-          SizedBox(height: 8),
-          textField("Пол"),
-          SizedBox(height: 8),
-          textField("Дата рождения"),
-          SizedBox(height: 8),
-          textField("Место рождения"),
-          SizedBox(height: 32),
-          //
-          Text(
-            "Паспортные данные",
-            style: GoogleFonts.ptSerif(fontSize: 24),
-          ),
-          SizedBox(height: 8),
-          textField("Серия"),
-          SizedBox(height: 8),
-          textField("Номер"),
-          SizedBox(height: 8),
-          textField("Дата выдачи"),
-          SizedBox(height: 8),
-          textField("Кем выдан"),
-          SizedBox(height: 8),
-          textField("Адрес регистрации"),
-          SizedBox(height: 32),
-          //
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Уже есть аккаунт?"),
-              TextButton(
-                onPressed: () {
-                  setState(() {
-
-                  });
-                },
-                child: Text("Войти"),
-                style: ButtonStyle(
-                  foregroundColor:
-                  MaterialStateProperty.all(ColorResources.accentRed),
-                  overlayColor: MaterialStateProperty.all(
-                    ColorResources.accentRed.withOpacity(0.1),
-                  ),
-                ),
-              )
-            ],
-          ),
-          SizedBox(height: 8),
-          Container(
-            height: 48,
-            width: double.infinity,
-            child: CupertinoButton(
-              color: ColorResources.accentRed,
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => MyApp()),
-                );
-              },
-              child: Text("Подтвердить и завершить"),
+    return CupertinoPageScaffold(
+      child: CustomScrollView(
+        slivers: [
+          CupertinoSliverNavigationBar(
+            largeTitle: Text(
+              "Регистрация",
+              style: GoogleFonts.ptSerif(fontWeight: FontWeight.w100),
             ),
           ),
-          SizedBox(height: 16),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                verticalDirection: VerticalDirection.down,
+                children: [
+                  const Text(
+                    "Заполните данные для создания аккаунта, если вы — бизнес",
+                    style: TextStyle(fontWeight: FontWeight.w300, fontSize: 16),
+                  ),
+                  SizedBox(height: 32),
+
+                  Text(
+                    "Контактные данные",
+                    style: GoogleFonts.ptSerif(fontSize: 24),
+                  ),
+                  SizedBox(height: 8),
+                  textField("Телефон"),
+                  SizedBox(height: 8),
+                  textField("Адрес электронной почты"),
+                  SizedBox(height: 32),
+                  //
+                  Text(
+                    "Основные данные",
+                    style: GoogleFonts.ptSerif(fontSize: 24),
+                  ),
+                  SizedBox(height: 8),
+                  textField("Фамилия"),
+                  SizedBox(height: 8),
+                  textField("Имя"),
+                  SizedBox(height: 8),
+                  textField("Отчество"),
+                  SizedBox(height: 8),
+                  textField("ИНН"),
+                  SizedBox(height: 8),
+                  textField("СНИЛС"),
+                  SizedBox(height: 8),
+                  textField("Пол"),
+                  SizedBox(height: 8),
+                  textField("Дата рождения"),
+                  SizedBox(height: 8),
+                  textField("Место рождения"),
+                  SizedBox(height: 32),
+                  //
+                  Text(
+                    "Паспортные данные",
+                    style: GoogleFonts.ptSerif(fontSize: 24),
+                  ),
+                  SizedBox(height: 8),
+                  textField("Серия"),
+                  SizedBox(height: 8),
+                  textField("Номер"),
+                  SizedBox(height: 8),
+                  textField("Дата выдачи"),
+                  SizedBox(height: 8),
+                  textField("Кем выдан"),
+                  SizedBox(height: 8),
+                  textField("Адрес регистрации"),
+                  SizedBox(height: 32),
+                  //
+
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text("Уже есть аккаунт?"),
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            widget.onChangeFlow();
+                          });
+                        },
+                        child: Text("Войти"),
+                        style: ButtonStyle(
+                          foregroundColor:
+                          MaterialStateProperty.all(ColorResources.accentRed),
+                          overlayColor: MaterialStateProperty.all(
+                            ColorResources.accentRed.withOpacity(0.1),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Container(
+                    height: 48,
+                    width: double.infinity,
+                    child: CupertinoButton(
+                      color: ColorResources.accentRed,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => MyApp()),
+                        );
+                      },
+                      child: Text("Подтвердить и завершить"),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );

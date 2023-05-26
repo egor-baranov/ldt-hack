@@ -71,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           BottomNavigationBarItem(
             icon: Icon(CupertinoIcons.chat_bubble_text_fill),
-            label: "Чат поддержки",
+            label: "Чат",
             backgroundColor: CupertinoColors.systemGrey6,
           ),
           BottomNavigationBarItem(

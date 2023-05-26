@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:lodt_hack/screens/auth/login.dart';
 import 'package:lodt_hack/screens/auth/register.dart';
 
-
-
 class Auth extends StatefulWidget {
   const Auth({super.key});
 
@@ -38,10 +36,19 @@ class _AuthState extends State<Auth> {
     return Scaffold(
       backgroundColor: CupertinoColors.systemBackground,
       body: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: useLogin ? Login() : Register(),
-        ),
+        child: useLogin
+            ? Login(
+                onChangeFlow: () => {
+                      setState(() {
+                        useLogin = false;
+                      })
+                    })
+            : Register(
+                onChangeFlow: () => {
+                      setState(() {
+                        useLogin = true;
+                      })
+                    }),
       ),
     );
   }

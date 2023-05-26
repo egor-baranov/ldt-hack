@@ -44,79 +44,115 @@ class _AccountState extends State<Account> {
       );
     }
 
-    return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            verticalDirection: VerticalDirection.down,
-            children: [
-              SizedBox(height: 16),
-              Text(
-                "Профиль",
-                style: GoogleFonts.ptSerif(fontSize: 32),
-              ),
-              TextButton(
-                onPressed: () {},
-                child: Text("Редактировать данные"),
-                style: ButtonStyle(
-                  foregroundColor:
-                      MaterialStateProperty.all(ColorResources.accentRed),
-                  overlayColor: MaterialStateProperty.all(
-                    ColorResources.accentRed.withOpacity(0.1),
-                  ),
-                ),
-              ),
-              SizedBox(height: 16),
-              accountCard("Род деятельности", "Предприниматель"),
-              SizedBox(height: 32),
-              Text(
-                "Контактные данные",
-                style: GoogleFonts.ptSerif(fontSize: 24),
-              ),
-              SizedBox(height: 8),
-              accountCard("Телефон", "+79776661234"),
-              SizedBox(height: 8),
-              accountCard("Адрес электронной почты", "hello@yandex.ru"),
-              SizedBox(height: 32),
-              Text(
-                "Основные данные",
-                style: GoogleFonts.ptSerif(fontSize: 24),
-              ),
-              SizedBox(height: 8),
-              accountCard("Фамилия", "Антонов"),
-              SizedBox(height: 8),
-              accountCard("Имя", "Алексей"),
-              SizedBox(height: 8),
-              accountCard("Отчество", "Сергеевич"),
-              SizedBox(height: 8),
-              accountCard("ИНН", "7743013902"),
-              SizedBox(height: 8),
-              accountCard("СНИЛС", "20017148898"),
-              SizedBox(height: 8),
-              accountCard("Пол", "Мужской"),
-              SizedBox(height: 8),
-              accountCard("Дата рождения", "31.08.1986"),
-              SizedBox(height: 8),
-              accountCard("Место рождения", "г. Москва"),
-              SizedBox(height: 32),
-              Text(
-                "Паспортные данные",
-                style: GoogleFonts.ptSerif(fontSize: 24),
-              ),
-              SizedBox(height: 8),
-              accountCard("Серия", "4321"),
-              SizedBox(height: 8),
-              accountCard("Номер", "564321"),
-              SizedBox(height: 8),
-              accountCard("Дата выдачи", "31.12.2016"),
-              SizedBox(height: 8),
-              accountCard("Кем выдан", "МВД ПО САНКТ-ПЕТЕРБУРГУ"),
-              SizedBox(height: 8),
-              accountCard("Адрес регистрации", "г. Санкт-Петербург"),
-              SizedBox(height: 16),
-            ]),
+    return CupertinoPageScaffold(
+      child: CustomScrollView(
+        slivers: [
+          CupertinoSliverNavigationBar(
+            largeTitle: Text(
+              "Профиль",
+              style: GoogleFonts.ptSerif(fontWeight: FontWeight.w100),
+            ),
+            trailing:IconButton(
+              icon: const Icon(CupertinoIcons.settings_solid),
+              onPressed: () {
+                showDatePicker(
+                  builder: (context, child) {
+                    return Theme(
+                      data: Theme.of(context).copyWith(
+                        colorScheme: const ColorScheme.light(
+                          primary: ColorResources.accentRed,
+                          onPrimary: Colors.white,
+                          onSurface: Colors.black,
+                        ),
+                        textButtonTheme: TextButtonThemeData(
+                          style: TextButton.styleFrom(
+                            foregroundColor: ColorResources.accentRed,
+                          ),
+                        ),
+                      ),
+                      child: child!,
+                    );
+                  },
+                  context: context,
+                  firstDate: DateTime.parse("1900-01-01"),
+                  lastDate: DateTime.parse("2300-12-31"),
+                  initialDate: DateTime.now(),
+                );
+              },
+            ),
+          ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  verticalDirection: VerticalDirection.down,
+                  children: [
+                    TextButton(
+                      onPressed: () {},
+                      child: Text("Редактировать данные"),
+                      style: ButtonStyle(
+                        foregroundColor:
+                            MaterialStateProperty.all(ColorResources.accentRed),
+                        overlayColor: MaterialStateProperty.all(
+                          ColorResources.accentRed.withOpacity(0.1),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    accountCard("Род деятельности", "Предприниматель"),
+                    SizedBox(height: 32),
+                    Text(
+                      "Контактные данные",
+                      style: GoogleFonts.ptSerif(fontSize: 24),
+                    ),
+                    SizedBox(height: 8),
+                    accountCard("Телефон", "+79776661234"),
+                    SizedBox(height: 8),
+                    accountCard("Адрес электронной почты", "hello@yandex.ru"),
+                    SizedBox(height: 32),
+                    Text(
+                      "Основные данные",
+                      style: GoogleFonts.ptSerif(fontSize: 24),
+                    ),
+                    SizedBox(height: 8),
+                    accountCard("Фамилия", "Антонов"),
+                    SizedBox(height: 8),
+                    accountCard("Имя", "Алексей"),
+                    SizedBox(height: 8),
+                    accountCard("Отчество", "Сергеевич"),
+                    SizedBox(height: 8),
+                    accountCard("ИНН", "7743013902"),
+                    SizedBox(height: 8),
+                    accountCard("СНИЛС", "20017148898"),
+                    SizedBox(height: 8),
+                    accountCard("Пол", "Мужской"),
+                    SizedBox(height: 8),
+                    accountCard("Дата рождения", "31.08.1986"),
+                    SizedBox(height: 8),
+                    accountCard("Место рождения", "г. Москва"),
+                    SizedBox(height: 32),
+                    Text(
+                      "Паспортные данные",
+                      style: GoogleFonts.ptSerif(fontSize: 24),
+                    ),
+                    SizedBox(height: 8),
+                    accountCard("Серия", "4321"),
+                    SizedBox(height: 8),
+                    accountCard("Номер", "564321"),
+                    SizedBox(height: 8),
+                    accountCard("Дата выдачи", "31.12.2016"),
+                    SizedBox(height: 8),
+                    accountCard("Кем выдан", "МВД ПО САНКТ-ПЕТЕРБУРГУ"),
+                    SizedBox(height: 8),
+                    accountCard("Адрес регистрации", "г. Санкт-Петербург"),
+                    SizedBox(height: 16),
+                  ]),
+            ),
+          ),
+        ],
       ),
     );
   }

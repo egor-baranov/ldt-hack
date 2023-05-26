@@ -45,80 +45,84 @@ class _ConsultationState extends State<Consultation> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: CupertinoColors.systemBackground,
-      body: SafeArea(
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              verticalDirection: VerticalDirection.down,
-              children: [
-                SizedBox(height: 16),
-                Text(
-                  "Консультация",
-                  style: GoogleFonts.ptSerif(fontSize: 32),
-                ),
-                TextButton(
-                  onPressed: () {},
-                  child: Text("Редактировать данные"),
-                  style: ButtonStyle(
-                    foregroundColor:
-                        MaterialStateProperty.all(ColorResources.accentRed),
-                    overlayColor: MaterialStateProperty.all(
-                      ColorResources.accentRed.withOpacity(0.1),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 16),
-                consultationCard("Тема",
-                    "Обсуждение нормативных актов и их влияния на бизнес"),
-                SizedBox(height: 8),
-                consultationCard("Описание",
-                    "Требуется обсудить перечень нормативных актов"),
-                SizedBox(height: 8),
-                consultationCard("Дата начала", "22.05.2023"),
-                SizedBox(height: 8),
-                consultationCard("Время начала", "13:30"),
-                SizedBox(height: 32),
-                Container(
-                  height: 48,
-                  width: double.infinity,
-                  child: CupertinoButton(
-                    color: ColorResources.accentRed,
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => Call()),
-                      );
-                    },
-                    child: Text("Подключиться"),
-                  ),
-                ),
-                SizedBox(height: 8),
-                Container(
-                  height: 48,
-                  width: double.infinity,
-                  child: CupertinoButton(
-                    color: ColorResources.accentPink,
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text(
-                      "Отменить консультацию",
-                      style: TextStyle(
-                        color: ColorResources.accentRed,
+
+    return CupertinoPageScaffold(
+      child: CustomScrollView(
+        slivers: [
+          CupertinoSliverNavigationBar(
+            largeTitle: Text(
+              "Консультация",
+              style: GoogleFonts.ptSerif(fontWeight: FontWeight.w100),
+            ),
+          ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                verticalDirection: VerticalDirection.down,
+                children: [
+                  TextButton(
+                    onPressed: () {},
+                    child: Text("Редактировать данные"),
+                    style: ButtonStyle(
+                      foregroundColor:
+                      MaterialStateProperty.all(ColorResources.accentRed),
+                      overlayColor: MaterialStateProperty.all(
+                        ColorResources.accentRed.withOpacity(0.1),
                       ),
                     ),
                   ),
-                ),
-                SizedBox(height: 16),
-              ],
+                  SizedBox(height: 16),
+                  consultationCard(
+                      "Тема", "Обсуждение нормативных актов и их влияния на бизнес"),
+                  SizedBox(height: 8),
+                  consultationCard(
+                      "Описание", "Требуется обсудить перечень нормативных актов"),
+                  SizedBox(height: 8),
+                  consultationCard("Дата начала", "22.05.2023"),
+                  SizedBox(height: 8),
+                  consultationCard("Время начала", "13:30"),
+                  SizedBox(height: 32),
+                  Container(
+                    height: 48,
+                    width: double.infinity,
+                    child: CupertinoButton(
+                      color: ColorResources.accentRed,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => Call()),
+                        );
+                      },
+                      child: Text("Подключиться"),
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Container(
+                    height: 48,
+                    width: double.infinity,
+                    child: CupertinoButton(
+                      color: ColorResources.accentPink,
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      child: const Text(
+                        "Отменить консультацию",
+                        style: TextStyle(
+                          color: ColorResources.accentRed,
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

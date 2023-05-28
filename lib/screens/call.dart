@@ -10,9 +10,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:agora_uikit/agora_uikit.dart';
 
 class Call extends StatefulWidget {
-  const Call({super.key, required this.consultationModel});
+  const Call({super.key, required this.consultationModel, required this.channel});
 
   final ConsultationModel consultationModel;
+  final String channel;
 
   @override
   State<Call> createState() => _CallState();
@@ -28,7 +29,7 @@ class _CallState extends State<Call> {
     agoraConnectionData: AgoraConnectionData(
       username: "user" + Random.secure().nextInt(1000).toString(),
       appId: "faa5e42e20664f2e8090edd45ae9b1a6",
-      channelName: "test",
+      channelName: "default",
       tempToken:
           "007eJxTYCjcJSPG+XrL3DuJcdutN3E+neHUL6C6eWaJ88x5K7QT79srMKQlJpqmmhilGhmYmZmkGaVaGFgapKakmJgmplomGSaa1aUUpDQEMjJM1YlgZmSAQBCfhaEktbiEgQEAGOMelA==",
     ),

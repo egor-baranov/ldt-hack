@@ -3,6 +3,8 @@ import 'dart:ffi';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lodt_hack/generated/app.pb.dart';
+import 'package:lodt_hack/generated/google/protobuf/timestamp.pb.dart';
 import 'package:lodt_hack/main.dart';
 import 'package:lodt_hack/models/consultation/Consultation.dart';
 import 'package:lodt_hack/styles/ColorResources.dart';
@@ -31,10 +33,23 @@ class _CreateConsultationState extends State<CreateConsultation> {
   final createConsultationFormKey = GlobalKey<FormState>();
   String? token;
 
-  List<int> authorityIds = [];
+  List<ListConsultationTopicsResponse_AuthorityTopics> authorityTopics = [];
   List<String> authorityNames = [];
 
+  List<ListConsultationTopicsResponse_AuthorityTopic> consultationTopics = [];
+  List<String> consultationNames = [];
+
+  List<Timestamp> availableDates = [];
+  List<String> dateNames = [];
+
+  List<ListAvailableConsultationSlotsResponse_ConsultationSlot> availableSlots =
+      [];
+  List<String> availableSlotNames = [];
+
   String selectedAuthority = "";
+  String consultationTheme = "";
+  String selectedDateName = "";
+  String selectedSlotName = "";
 
   void fetchData() {
     storageProvider.getConsultations().then(
@@ -62,6 +77,138 @@ class _CreateConsultationState extends State<CreateConsultation> {
     fetchData();
   }
 
+  void getAvailableDates() async {
+    try {
+      final response = await apiClient.listAvailableConsultationDates(
+        ListAvailableConsultationDatesRequest(
+          authorityId: authorityTopics
+              .where((element) => element.authorityName == selectedAuthority)
+              .first
+              .authorityId,
+          fromDate: dateFromString("31.08.2002"),
+          toDate: dateFromString("31.08.2024"),
+        ),
+        options: CallOptions(
+          metadata: {'Authorization': 'Bearer $token'},
+        ),
+      );
+
+      print(response.availableDates);
+
+      setState(() {
+        availableDates = response.availableDates;
+        dateNames = availableDates
+            .map((e) => formatDate(stringFromTimestamp(e)))
+            .toList();
+        selectedDateName = dateNames.isNotEmpty ? dateNames.first : "";
+
+        getAvailableSlots();
+      });
+    } on GrpcError catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Ошибка получения данных"),
+            content: Text(e.message ?? "Текст ошибки отсутствует"),
+            actions: [
+              TextButton(
+                child: Text("Продолжить"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void getAvailableSlots() async {
+    try {
+      final response = await apiClient.listAvailableConsultationSlots(
+        ListAvailableConsultationSlotsRequest(
+            authorityId: authorityTopics
+                .where((element) => element.authorityName == selectedAuthority)
+                .first
+                .authorityId,
+            date: availableDates[dateNames.indexOf(selectedDateName)]),
+        options: CallOptions(
+          metadata: {'Authorization': 'Bearer $token'},
+        ),
+      );
+
+      print(response.consultationSlots);
+
+      setState(() {
+        availableSlots = response.consultationSlots;
+        availableSlotNames = availableSlots
+            .map((e) => formatInterval(e.fromTime, e.toTime))
+            .toList();
+        selectedSlotName = availableSlotNames.first;
+      });
+    } on GrpcError catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Ошибка получения данных"),
+            content: Text(e.message ?? "Текст ошибки отсутствует"),
+            actions: [
+              TextButton(
+                child: Text("Продолжить"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void createConsultation() async {
+    try {
+      final response = await apiClient.createConsultationAppointment(
+        CreateConsultationAppointmentRequest(
+          topicId: consultationTopics
+              .where((element) => element.topicName == consultationTheme)
+              .first
+              .topicId,
+          slotId:
+              availableSlots[availableSlotNames.indexOf(selectedSlotName)].id,
+        ),
+        options: CallOptions(
+          metadata: {'Authorization': 'Bearer $token'},
+        ),
+      );
+
+      setState(() {
+        Navigator.pop(context);
+      });
+    } on GrpcError catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Ошибка получения данных"),
+            content: Text(e.message ?? "Текст ошибки отсутствует"),
+            actions: [
+              TextButton(
+                child: Text("Продолжить"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
+    }
+  }
+
   void getConsultationTopics() async {
     try {
       final response = await apiClient.listConsultationTopics(
@@ -72,19 +219,20 @@ class _CreateConsultationState extends State<CreateConsultation> {
       );
 
       setState(() {
-        authorityIds = response.authorityTopics
-            .map((e) => e.authorityId.toInt())
-            .toSet()
-            .toList();
-
+        authorityTopics = response.authorityTopics;
         authorityNames = response.authorityTopics
-            .map((e) => e.authorityName.length > 35
-                ? e.authorityName.substring(0, 35)
-                : e.authorityName)
+            .map((e) => e.authorityName)
             .toSet()
             .toList();
 
-        print(authorityNames);
+        selectedAuthority = authorityNames.first;
+
+        consultationTopics = authorityTopics.first.topics;
+        consultationNames = consultationTopics.map((e) => e.topicName).toList();
+
+        consultationTheme = consultationTopics.first.topicName;
+
+        getAvailableDates();
       });
     } on GrpcError catch (e) {
       showDialog(
@@ -127,19 +275,20 @@ class _CreateConsultationState extends State<CreateConsultation> {
     );
   }
 
-  Widget dropdownList() {
+  Widget authorityDropdownList() {
     return DropdownButton2(
-      hint: const Text('Контрольно-надзорный орган'),
+      isExpanded: true,
+      hint: Text('Контрольно-надзорный орган'),
       items: authorityNames
-          .toSet()
-          .toList()
           .map(
             (e) => DropdownMenuItem(
               value: e,
+              onTap: () {
+                return;
+              },
               child: Text(
                 e,
-                softWrap: true,
-                maxLines: 5,
+                overflow: TextOverflow.fade,
               ),
             ),
           )
@@ -147,14 +296,26 @@ class _CreateConsultationState extends State<CreateConsultation> {
       onChanged: (v) {
         setState(() {
           selectedAuthority = v as String;
+
+          consultationTopics = authorityTopics
+              .where((element) => element.authorityName == selectedAuthority)
+              .first
+              .topics;
+
+          consultationNames =
+              consultationTopics.map((e) => e.topicName).toList();
+          consultationTheme = consultationTopics.first.topicName;
+
+          getAvailableDates();
         });
       },
+      value: selectedAuthority,
       buttonStyleData: const ButtonStyleData(
         height: 80,
         width: 400,
       ),
       menuItemStyleData: const MenuItemStyleData(
-        height: 80,
+        height: 100,
       ),
       dropdownStyleData: DropdownStyleData(
         width: 350,
@@ -164,43 +325,121 @@ class _CreateConsultationState extends State<CreateConsultation> {
         elevation: 8,
       ),
     );
+  }
 
-    return DropdownButtonHideUnderline(
-      child: DropdownButton2(
-        hint: Text(
-          'Контрольно-надзорный орган',
-          style: TextStyle(
-            fontSize: 14,
-            color: Theme.of(context).hintColor,
-          ),
+  Widget consultationDropdownList() {
+    return DropdownButton2(
+      isExpanded: true,
+      hint: Text('Тема консультации КНО'),
+      items: consultationNames
+          .map(
+            (e) => DropdownMenuItem(
+              onTap: () {},
+              value: e,
+              child: Text(
+                e,
+                overflow: TextOverflow.fade,
+              ),
+            ),
+          )
+          .toList(),
+      onChanged: (v) {
+        setState(() {
+          consultationTheme = v as String;
+        });
+      },
+      value: consultationTheme,
+      buttonStyleData: const ButtonStyleData(
+        height: 80,
+        width: 400,
+      ),
+      menuItemStyleData: const MenuItemStyleData(
+        height: 120,
+      ),
+      dropdownStyleData: DropdownStyleData(
+        width: 350,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
         ),
-        items: authorityNames
-            .toSet()
-            .toList()
-            .map((item) => DropdownMenuItem<String>(
-                  value: item,
-                  child: Text(
-                    item,
-                    style: const TextStyle(
-                      fontSize: 14,
-                    ),
-                  ),
-                ))
-            .toList(),
-        isExpanded: true,
-        value: selectedAuthority,
-        onChanged: (value) {
-          setState(() {
-            selectedAuthority = value as String;
-          });
-        },
-        buttonStyleData: const ButtonStyleData(
-          height: 40,
-          width: 300,
+        elevation: 8,
+      ),
+    );
+  }
+
+  Widget datesDropdownList() {
+    return DropdownButton2(
+      isExpanded: true,
+      hint: Text('Даты записи'),
+      items: dateNames
+          .map(
+            (e) => DropdownMenuItem(
+              onTap: () {},
+              value: e,
+              child: Text(
+                e,
+                overflow: TextOverflow.visible,
+              ),
+            ),
+          )
+          .toList(),
+      onChanged: (v) {
+        setState(() {
+          selectedDateName = v as String;
+        });
+      },
+      value: selectedDateName,
+      buttonStyleData: const ButtonStyleData(
+        height: 80,
+        width: 400,
+      ),
+      menuItemStyleData: const MenuItemStyleData(
+        height: 48,
+      ),
+      dropdownStyleData: DropdownStyleData(
+        width: 350,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
         ),
-        menuItemStyleData: const MenuItemStyleData(
-          height: 40,
+        elevation: 8,
+      ),
+    );
+  }
+
+  Widget slotsDropdownList() {
+    return DropdownButton2(
+      isExpanded: true,
+      hint: Text('Временные интервалы записи'),
+      items: availableSlotNames
+          .map(
+            (e) => DropdownMenuItem(
+              onTap: () {},
+              value: e,
+              child: Text(
+                e,
+                overflow: TextOverflow.visible,
+              ),
+            ),
+          )
+          .toList(),
+      onChanged: (v) {
+        setState(() {
+          selectedSlotName = v as String;
+        });
+      },
+      value: selectedSlotName,
+      buttonStyleData: const ButtonStyleData(
+        height: 80,
+        width: 400,
+      ),
+      menuItemStyleData: const MenuItemStyleData(
+        height: 48,
+      ),
+      dropdownStyleData: DropdownStyleData(
+        width: 350,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
         ),
+        elevation: 8,
       ),
     );
   }
@@ -236,43 +475,13 @@ class _CreateConsultationState extends State<CreateConsultation> {
                               fontWeight: FontWeight.w300, fontSize: 16),
                         ),
                         SizedBox(height: 32),
-                        dropdownList(),
-                        textField("Контрольно-надзорный орган", (value) {
-                          if (isBlank(value)) {
-                            return "Поле КНО не должно быть пустым";
-                          }
-                        }, (text) {
-                          consultation.title = text;
-                        }, null),
-                        SizedBox(height: 8),
-                        textField("Описание", (value) {
-                          if (isBlank(value)) {
-                            return "Описание не должно быть пустым";
-                          }
-                        }, (text) {
-                          consultation.description = text;
-                        }, null),
-                        SizedBox(height: 8),
-                        textField("Дата начала", (value) {
-                          if (isBlank(value)) {
-                            return "Дата начала не должна быть пустой";
-                          }
-                        }, (text) {
-                          consultation.day = text;
-                        }, MaskedInputFormatter("00.00.0000")),
-                        SizedBox(height: 8),
-                        textField(
-                          "Время начала",
-                          (value) {
-                            if (isBlank(value)) {
-                              return "Время начала не должно быть пустым";
-                            }
-                          },
-                          (text) {
-                            consultation.time = text;
-                          },
-                          MaskedInputFormatter("00:00"),
-                        ),
+                        authorityDropdownList(),
+                        SizedBox(height: 32),
+                        consultationDropdownList(),
+                        SizedBox(height: 32),
+                        datesDropdownList(),
+                        SizedBox(height: 32),
+                        slotsDropdownList(),
                         SizedBox(height: 32),
                         Container(
                           height: 48,
@@ -280,14 +489,18 @@ class _CreateConsultationState extends State<CreateConsultation> {
                           child: CupertinoButton(
                             color: ColorResources.accentRed,
                             onPressed: () {
-                              if (createConsultationFormKey.currentState!
-                                  .validate()) {
-                                consultation.tags = ["Есть запись"];
-                                consultations.consultations.add(consultation);
-                                storageProvider
-                                    .saveConsultations(consultations);
-                                Navigator.pop(context);
-                              }
+                              createConsultation();
+
+                              // if (createConsultationFormKey.currentState!
+                              //     .validate()) {
+                              //
+                              //
+                              //   consultation.tags = ["Есть запись"];
+                              //   consultations.consultations.add(consultation);
+                              //   storageProvider
+                              //       .saveConsultations(consultations);
+                              //
+                              // }
                             },
                             child: const Text(
                               "Записаться на консультацию",

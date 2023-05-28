@@ -7,6 +7,9 @@ import 'package:lodt_hack/utils/calendar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../clients/ApiClient.dart';
+import 'package:grpc/grpc.dart';
+import '../generated/google/protobuf/empty.pb.dart';
 import '../models/User.dart';
 import '../models/consultation/Consultation.dart';
 import '../models/consultation/ConsultationHolder.dart';
@@ -35,15 +38,51 @@ class _DashboardState extends State<Dashboard> {
   User user = User();
   String? token;
 
-  void fetchData() {
-    storageProvider.getConsultations().then(
-          (value) => setState(
-            () {
-              consultations = value;
-              print(consultations.toJson());
-            },
+  Future<void> fetchConsultations() async {
+    try {
+      final response = await apiClient.listConsultationAppointments(
+        Empty(),
+        options: CallOptions(
+          metadata: {'Authorization': 'Bearer ${token!}'},
+        ),
+      );
+
+      setState(() {
+        consultations.consultations = response.appointmentInfo
+            .map(
+              (e) => ConsultationModel(
+            id: e.id,
+            title: e.topic,
+            description:
+            "Предприниматель: ${e.businessUser.firstName} ${e.businessUser.lastName}\nИнспектор: ${e.authorityUser.firstName} ${e.authorityUser.lastName}",
+            day: stringFromTimestamp(e.fromTime),
+            time: formatTime(e.fromTime),
           ),
-        );
+        )
+            .toList();
+      });
+    } on GrpcError catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Ошибка получения данных"),
+            content: Text(e.message ?? "Текст ошибки отсутствует"),
+            actions: [
+              TextButton(
+                child: Text("Продолжить"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void fetchData() {
     storageProvider.getUser().then(
           (value) => setState(
             () {
@@ -55,6 +94,7 @@ class _DashboardState extends State<Dashboard> {
           (value) => setState(
             () {
               token = value!;
+              fetchConsultations();
             },
           ),
         );

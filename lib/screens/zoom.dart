@@ -27,14 +27,6 @@ class _ZoomState extends State<Zoom> {
   String? token;
 
   void fetchData() {
-    storageProvider.getConsultations().then(
-          (value) => setState(
-            () {
-              consultations = value;
-              print(consultations.toJson());
-            },
-          ),
-        );
     storageProvider.getUser().then(
           (value) => setState(
             () {
@@ -46,6 +38,7 @@ class _ZoomState extends State<Zoom> {
           (value) => setState(
             () {
               token = value!;
+              fetchConsultations();
             },
           ),
         );
@@ -57,23 +50,48 @@ class _ZoomState extends State<Zoom> {
     fetchData();
   }
 
-  Future<List<ConsultationModel>> fetchConsultations() async {
-    final response = await apiClient.listConsultationTopics(
-      Empty(),
-      options: CallOptions(
-        metadata: {'Authorization': 'Bearer ${token!}'},
-      ),
-    );
+  Future<void> fetchConsultations() async {
+    try {
+      final response = await apiClient.listConsultationAppointments(
+        Empty(),
+        options: CallOptions(
+          metadata: {'Authorization': 'Bearer ${token!}'},
+        ),
+      );
 
-    return response.authorityTopics
-        .map(
-          (e) =>
-              ConsultationModel(
-                  id: e.authorityId.toString(),
-                  title: e.authorityName,
+      setState(() {
+        consultations.consultations = response.appointmentInfo
+            .map(
+              (e) => ConsultationModel(
+                id: e.id,
+                title: e.topic,
+                description:
+                    "Предприниматель: ${e.businessUser.firstName} ${e.businessUser.lastName}\nИнспектор: ${e.authorityUser.firstName} ${e.authorityUser.lastName}",
+                day: stringFromTimestamp(e.fromTime),
+                time: formatTime(e.fromTime),
               ),
-        )
-        .toList();
+            )
+            .toList();
+      });
+    } on GrpcError catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Ошибка получения данных"),
+            content: Text(e.message ?? "Текст ошибки отсутствует"),
+            actions: [
+              TextButton(
+                child: Text("Продолжить"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
+    }
   }
 
   List<ConsultationModel> sorted(List<ConsultationModel> c) {

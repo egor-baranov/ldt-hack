@@ -109,6 +109,7 @@ class _ConsultationState extends State<Consultation> {
                           CupertinoPageRoute(
                             builder: (context) => Call(
                               consultationModel: widget.consultationModel,
+                              channel: widget.consultationModel.id ?? "default",
                             ),
                           ),
                         );

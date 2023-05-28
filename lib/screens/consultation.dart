@@ -94,7 +94,7 @@ class _ConsultationState extends State<Consultation> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => Call()),
+                          CupertinoPageRoute(builder: (context) => Call()),
                         );
                       },
                       child: Text("Подключиться"),

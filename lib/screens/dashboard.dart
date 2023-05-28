@@ -48,13 +48,15 @@ class _DashboardState extends State<Dashboard> {
               "Главная",
               style: GoogleFonts.ptSerif(fontWeight: FontWeight.w100),
             ),
-            trailing: IconButton(
-              onPressed: () {
-                widget.onSearch();
-              },
-              iconSize: 28,
-              color: CupertinoColors.darkBackgroundGray,
-              icon: const Icon(CupertinoIcons.search),
+            trailing: Material(
+              child: IconButton(
+                onPressed: () {
+                  widget.onSearch();
+                },
+                iconSize: 28,
+                color: CupertinoColors.darkBackgroundGray,
+                icon: const Icon(CupertinoIcons.search),
+              ),
             ),
           ),
           SliverFillRemaining(
@@ -95,7 +97,7 @@ class _DashboardState extends State<Dashboard> {
                       child: Text("Открыть календарь"),
                       style: ButtonStyle(
                         foregroundColor:
-                        MaterialStateProperty.all(ColorResources.accentRed),
+                            MaterialStateProperty.all(ColorResources.accentRed),
                         overlayColor: MaterialStateProperty.all(
                           ColorResources.accentRed.withOpacity(0.1),
                         ),
@@ -110,7 +112,7 @@ class _DashboardState extends State<Dashboard> {
                       config: calendarConfig,
                       value: _singleDatePickerValueWithDefaultValue,
                       onValueChanged: (dates) => setState(
-                            () => _singleDatePickerValueWithDefaultValue = dates,
+                        () => _singleDatePickerValueWithDefaultValue = dates,
                       ),
                     ),
                     Row(
@@ -124,8 +126,8 @@ class _DashboardState extends State<Dashboard> {
                           onPressed: () {},
                           child: Icon(Icons.expand_more_rounded, size: 24),
                           style: ButtonStyle(
-                            foregroundColor:
-                            MaterialStateProperty.all(ColorResources.accentRed),
+                            foregroundColor: MaterialStateProperty.all(
+                                ColorResources.accentRed),
                             overlayColor: MaterialStateProperty.all(
                               ColorResources.accentRed.withOpacity(0.1),
                             ),
@@ -149,8 +151,8 @@ class _DashboardState extends State<Dashboard> {
                           onPressed: () {},
                           child: Icon(Icons.expand_more_rounded, size: 24),
                           style: ButtonStyle(
-                            foregroundColor:
-                            MaterialStateProperty.all(ColorResources.accentRed),
+                            foregroundColor: MaterialStateProperty.all(
+                                ColorResources.accentRed),
                             overlayColor: MaterialStateProperty.all(
                               ColorResources.accentRed.withOpacity(0.1),
                             ),
@@ -174,8 +176,8 @@ class _DashboardState extends State<Dashboard> {
                           onPressed: () {},
                           child: Icon(Icons.expand_more_rounded, size: 24),
                           style: ButtonStyle(
-                            foregroundColor:
-                            MaterialStateProperty.all(ColorResources.accentRed),
+                            foregroundColor: MaterialStateProperty.all(
+                                ColorResources.accentRed),
                             overlayColor: MaterialStateProperty.all(
                               ColorResources.accentRed.withOpacity(0.1),
                             ),
@@ -199,8 +201,8 @@ class _DashboardState extends State<Dashboard> {
                           onPressed: () {},
                           child: Icon(Icons.expand_more_rounded, size: 24),
                           style: ButtonStyle(
-                            foregroundColor:
-                            MaterialStateProperty.all(ColorResources.accentRed),
+                            foregroundColor: MaterialStateProperty.all(
+                                ColorResources.accentRed),
                             overlayColor: MaterialStateProperty.all(
                               ColorResources.accentRed.withOpacity(0.1),
                             ),
@@ -224,8 +226,8 @@ class _DashboardState extends State<Dashboard> {
                           onPressed: () {},
                           child: Icon(Icons.expand_more_rounded, size: 24),
                           style: ButtonStyle(
-                            foregroundColor:
-                            MaterialStateProperty.all(ColorResources.accentRed),
+                            foregroundColor: MaterialStateProperty.all(
+                                ColorResources.accentRed),
                             overlayColor: MaterialStateProperty.all(
                               ColorResources.accentRed.withOpacity(0.1),
                             ),

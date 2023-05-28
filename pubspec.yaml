@@ -16,6 +16,7 @@ dependencies:
   email_validator: ^2.1.17
   modal_bottom_sheet: ^2.1.2
   sheet: ^0.0.4+1
+  expandable: ^5.0.1
 
 dev_dependencies:
   flutter_test:
@@ -34,6 +35,7 @@ dev_dependencies:
   flutter_secure_storage: ^8.0.0
   flutter_multi_formatter: ^2.11.1
   json_serializable: ^6.7.0
+  url_launcher: ^6.1.11
 
   # to generate protobuf poggers run
   # dart pub global activate protoc_plugin

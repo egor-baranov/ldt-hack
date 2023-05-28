@@ -49,17 +49,25 @@ class _MyHomePageState extends State<MyHomePage> {
       // appBar: AppBar(toolbarHeight: 32),
       body: SafeArea(
           child: [
-            Dashboard(onSearch: () {
-              setState(() {
-                Navigator.push(context,
-                  CupertinoPageRoute(builder: (context) => Auth()),
-                );
-              });
-            }),
-            Chat(),
-            Zoom(),
-            Account()
-          ][_selectedIndex]),
+        Dashboard(
+          onSearch: () {
+            setState(() {
+              Navigator.push(
+                context,
+                CupertinoPageRoute(builder: (context) => Auth()),
+              );
+            });
+          },
+          onOpenZoom: () {
+            setState(() {
+              _selectedIndex = 2;
+            });
+          },
+        ),
+        Chat(),
+        Zoom(),
+        Account()
+      ][_selectedIndex]),
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: ColorResources.accentRed,
         unselectedItemColor: CupertinoColors.systemGrey,

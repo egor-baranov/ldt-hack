@@ -4,12 +4,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:agora_rtc_engine/agora_rtc_engine.dart';
+import 'package:lodt_hack/models/consultation/Consultation.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:agora_uikit/agora_uikit.dart';
 
 class Call extends StatefulWidget {
-  const Call({super.key});
+  const Call({super.key, required this.consultationModel});
+
+  final ConsultationModel consultationModel;
 
   @override
   State<Call> createState() => _CallState();

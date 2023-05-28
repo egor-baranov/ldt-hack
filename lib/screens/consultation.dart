@@ -3,17 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:lodt_hack/styles/ColorResources.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../models/consultation/Consultation.dart';
 import 'call.dart';
 
 class Consultation extends StatefulWidget {
-  const Consultation({super.key});
+  const Consultation({super.key, required this.consultationModel});
+
+  final ConsultationModel consultationModel;
 
   @override
   State<Consultation> createState() => _ConsultationState();
 }
 
 class _ConsultationState extends State<Consultation> {
-  Widget consultationCard(String type, String text) {
+  Widget consultationCard(String type, String? text) {
     return Material(
       color: CupertinoColors.systemGrey6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -33,7 +36,7 @@ class _ConsultationState extends State<Consultation> {
               ),
               SizedBox(height: 8),
               Text(
-                text,
+                text ?? "—",
                 style: GoogleFonts.inter(fontSize: 14),
               ),
             ],
@@ -45,7 +48,6 @@ class _ConsultationState extends State<Consultation> {
 
   @override
   Widget build(BuildContext context) {
-
     return CupertinoPageScaffold(
       child: CustomScrollView(
         slivers: [
@@ -69,7 +71,7 @@ class _ConsultationState extends State<Consultation> {
                     child: Text("Редактировать данные"),
                     style: ButtonStyle(
                       foregroundColor:
-                      MaterialStateProperty.all(ColorResources.accentRed),
+                          MaterialStateProperty.all(ColorResources.accentRed),
                       overlayColor: MaterialStateProperty.all(
                         ColorResources.accentRed.withOpacity(0.1),
                       ),
@@ -77,14 +79,24 @@ class _ConsultationState extends State<Consultation> {
                   ),
                   SizedBox(height: 16),
                   consultationCard(
-                      "Тема", "Обсуждение нормативных актов и их влияния на бизнес"),
+                    "Тема",
+                    widget.consultationModel.title,
+                  ),
                   SizedBox(height: 8),
                   consultationCard(
-                      "Описание", "Требуется обсудить перечень нормативных актов"),
+                    "Описание",
+                    widget.consultationModel.description,
+                  ),
                   SizedBox(height: 8),
-                  consultationCard("Дата начала", "22.05.2023"),
+                  consultationCard(
+                    "Дата начала",
+                    widget.consultationModel.day,
+                  ),
                   SizedBox(height: 8),
-                  consultationCard("Время начала", "13:30"),
+                  consultationCard(
+                    "Время начала",
+                    widget.consultationModel.time,
+                  ),
                   SizedBox(height: 32),
                   Container(
                     height: 48,
@@ -94,7 +106,11 @@ class _ConsultationState extends State<Consultation> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          CupertinoPageRoute(builder: (context) => Call()),
+                          CupertinoPageRoute(
+                            builder: (context) => Call(
+                              consultationModel: widget.consultationModel,
+                            ),
+                          ),
                         );
                       },
                       child: Text("Подключиться"),

@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lodt_hack/models/consultation/Consultation.dart';
+import 'package:lodt_hack/models/consultation/ConsultationHolder.dart';
+import 'package:lodt_hack/providers/LocalStorageProvider.dart';
 import 'package:lodt_hack/screens/create_consultation.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../styles/ColorResources.dart';
+import '../utils/parser.dart';
 import 'consultation.dart';
 
 class Zoom extends StatefulWidget {
@@ -14,16 +18,49 @@ class Zoom extends StatefulWidget {
 }
 
 class _ZoomState extends State<Zoom> {
-  Widget zoomCard(String title, String date, String time) {
+  ConsultationHolder consultations = ConsultationHolder([]);
+
+  void fetchData() {
+    storageProvider.getConsultations().then(
+          (value) => setState(
+            () {
+              consultations = value;
+              print(consultations.toJson());
+            },
+          ),
+        );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  List<ConsultationModel> sorted(List<ConsultationModel> c) {
+    c.sort((a, b) => dateFromString(a.day!)
+        .toDateTime()
+        .compareTo(dateFromString(b.day!).toDateTime()));
+    return c.reversed.toList();
+  }
+
+  Widget zoomCard(ConsultationModel consultation) {
     return Material(
       color: CupertinoColors.systemGrey6,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: InkWell(
         borderRadius: BorderRadius.all(Radius.circular(16)),
-        onTap: () => Navigator.push(
-          context,
-          CupertinoPageRoute(builder: (context) => Consultation()),
-        ),
+        onTap: () => {
+          Navigator.push(
+            context,
+            CupertinoPageRoute(
+              builder: (context) => Consultation(
+                consultationModel: consultation,
+              ),
+            ),
+          ),
+          fetchData()
+        },
         child: Container(
           width: double.infinity,
           child: Padding(
@@ -31,19 +68,21 @@ class _ZoomState extends State<Zoom> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title),
+                Text(consultation.title!),
                 SizedBox(height: 8),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "$date в $time",
+                      "${formatDate(consultation.day!)} в ${consultation.time}",
                       style: const TextStyle(
                           color: CupertinoColors.systemGrey, fontSize: 14),
                     ),
-                    const Text(
-                      "Есть запись",
-                      style: TextStyle(
+                    Text(
+                      consultation.tags == null || consultation.tags!.isEmpty
+                          ? ""
+                          : consultation.tags![0],
+                      style: const TextStyle(
                           color: ColorResources.accentRed, fontSize: 14),
                     ),
                   ],
@@ -102,89 +141,62 @@ class _ZoomState extends State<Zoom> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  verticalDirection: VerticalDirection.down,
-                  children: [
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          CupertinoPageRoute(
-                              builder: (context) => CreateConsultation()),
-                        );
-                      },
-                      child: Text("Записаться на консультацию"),
-                      style: ButtonStyle(
-                        foregroundColor:
-                            MaterialStateProperty.all(ColorResources.accentRed),
-                        overlayColor: MaterialStateProperty.all(
-                          ColorResources.accentRed.withOpacity(0.1),
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                verticalDirection: VerticalDirection.down,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => CreateConsultation(),
+                        ),
+                      );
+                      fetchData();
+                    },
+                    child: Text("Записаться на консультацию"),
+                    style: ButtonStyle(
+                      foregroundColor:
+                          MaterialStateProperty.all(ColorResources.accentRed),
+                      overlayColor: MaterialStateProperty.all(
+                        ColorResources.accentRed.withOpacity(0.1),
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  if (consultations.consultations.isEmpty)
+                    Expanded(
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxHeight: 300),
+                          child: Text(
+                            "Вы пока не записались ни на одну консультацию",
+                            softWrap: true,
+                            maxLines: 3,
+                            style: GoogleFonts.ptSerif(fontSize: 18),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
                       ),
                     ),
-                    SizedBox(height: 16),
-                    Text(
-                      "Сегодня",
-                      style: GoogleFonts.ptSerif(fontSize: 24),
+                  ...sorted(consultations.consultations).map(
+                    (e) => Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          formatDate(e.day!),
+                          textAlign: TextAlign.left,
+                          style: GoogleFonts.ptSerif(fontSize: 24),
+                        ),
+                        SizedBox(height: 4),
+                        zoomCard(e),
+                        SizedBox(height: 16),
+                      ],
                     ),
-                    SizedBox(height: 8),
-                    zoomCard(
-                        "Обсуждение нормативных актов и их влияния на бизнес",
-                        "24.03",
-                        "15:00"),
-                    SizedBox(height: 8),
-                    zoomCard(
-                        "Обсуждение нормативных актов и их влияния на бизнес",
-                        "24.03",
-                        "15:00"),
-                    SizedBox(height: 16),
-                    Text(
-                      "Вчера",
-                      style: GoogleFonts.ptSerif(fontSize: 24),
-                    ),
-                    SizedBox(height: 8),
-                    zoomCard(
-                        "Обсуждение нормативных актов и их влияния на бизнес",
-                        "24.03",
-                        "15:00"),
-                    SizedBox(height: 8),
-                    zoomCard(
-                        "Обсуждение нормативных актов и их влияния на бизнес",
-                        "24.03",
-                        "15:00"),
-                    SizedBox(height: 16),
-                    Text(
-                      "19 мая",
-                      style: GoogleFonts.ptSerif(fontSize: 24),
-                    ),
-                    SizedBox(height: 8),
-                    zoomCard(
-                        "Обсуждение нормативных актов и их влияния на бизнес",
-                        "24.03",
-                        "15:00"),
-                    SizedBox(height: 8),
-                    zoomCard(
-                        "Обсуждение нормативных актов и их влияния на бизнес",
-                        "24.03",
-                        "15:00"),
-                    SizedBox(height: 16),
-                    Text(
-                      "12 мая",
-                      style: GoogleFonts.ptSerif(fontSize: 24),
-                    ),
-                    SizedBox(height: 8),
-                    zoomCard(
-                        "Обсуждение нормативных актов и их влияния на бизнес",
-                        "24.03",
-                        "15:00"),
-                    SizedBox(height: 8),
-                    zoomCard(
-                        "Обсуждение нормативных актов и их влияния на бизнес",
-                        "24.03",
-                        "15:00"),
-                    SizedBox(height: 16),
-                  ]),
+                  ),
+                ],
+              ),
             ),
           ),
         ],

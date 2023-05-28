@@ -8,6 +8,10 @@ class ChatHolder {
   ChatHolder(List<Message> messages);
 
   ChatHolder.fromJson(Map<String, dynamic> json) {
+    if (json['messages'] == null) {
+      return;
+    }
+
     List<dynamic> m = jsonDecode(json['messages']);
     messages = m.map((e) => Message.fromJson(e)).toList();
   }

@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lodt_hack/models/chat/Chat.dart';
 
 import '../models/User.dart';
+import '../models/consultation/ConsultationHolder.dart';
 
 class LocalStorageProvider {
   final storage = const FlutterSecureStorage();
@@ -45,6 +46,25 @@ class LocalStorageProvider {
       key: "chat",
       value: jsonEncode(
         chat.toJson(),
+      ),
+    );
+  }
+
+  Future<ConsultationHolder> getConsultations() async {
+    final consultations = await storage.read(key: "consultations");
+
+    if (consultations == null) {
+      return ConsultationHolder([]);
+    }
+
+    return ConsultationHolder.fromJson(jsonDecode(consultations));
+  }
+
+  void saveConsultations(ConsultationHolder consultations) async {
+    storage.write(
+      key: "consultations",
+      value: jsonEncode(
+        consultations.toJson(),
       ),
     );
   }

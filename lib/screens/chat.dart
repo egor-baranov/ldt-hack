@@ -29,7 +29,16 @@ class _ChatState extends State<Chat> {
             () {
               chat = value;
               print(chat.toJson());
-              _scrollDown(200);
+              Future.delayed(
+                Duration(milliseconds: 50),
+                () {
+                  _controller.animateTo(
+                    _controller.position.maxScrollExtent,
+                    duration: Duration(milliseconds: 600),
+                    curve: Curves.ease,
+                  );
+                },
+              );
             },
           ),
         );
@@ -45,6 +54,59 @@ class _ChatState extends State<Chat> {
     });
   }
 
+  Widget rateCard() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Card(
+              color: ColorResources.accentRed,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    iconSize: 20,
+                    onPressed: () {
+                      sendMessage(
+                        "Спасибо за обратную связь, рад помочь!",
+                        false,
+                        [],
+                      );
+                    },
+                    icon: const Icon(
+                      Icons.thumb_up_rounded,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  IconButton(
+                    iconSize: 20,
+                    onPressed: () {
+                      sendMessage("Вот, что еще удалось найти:", false, [
+                        "Список нормативных актов",
+                        "Список органов контроля",
+                        "Список обязательных требований"
+                      ]);
+                    },
+                    icon: const Icon(
+                      Icons.thumb_down_rounded,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget chatCard(String text, bool my, List<String> results) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -54,7 +116,7 @@ class _ChatState extends State<Chat> {
               my ? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
             ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
+              constraints: const BoxConstraints(maxWidth: 340),
               child: Card(
                 color: my
                     ? ColorResources.accentRed
@@ -69,6 +131,7 @@ class _ChatState extends State<Chat> {
                     children: [
                       Text(
                         text,
+                        softWrap: true,
                         style: TextStyle(
                             color: (my ? Colors.white : Colors.black)),
                         maxLines: 10,
@@ -105,6 +168,7 @@ class _ChatState extends State<Chat> {
             ),
           ),
         ),
+        (my || results.isEmpty) ? SizedBox() : rateCard(),
         const SizedBox(height: 8),
       ],
     );
@@ -132,7 +196,7 @@ class _ChatState extends State<Chat> {
                 controller: _inputController,
                 cursorColor: Colors.black,
                 onSubmitted: (String text) {
-                  sendMessage(text);
+                  sendMessage(text, true, []);
                   _inputController.clear();
                 },
                 decoration: InputDecoration(
@@ -153,7 +217,7 @@ class _ChatState extends State<Chat> {
                   color: ColorResources.darkGrey),
               onPressed: () {
                 if (!isBlank(_inputController.text)) {
-                  sendMessage(_inputController.text);
+                  sendMessage(_inputController.text, true, []);
                   _inputController.clear();
                 }
               },
@@ -167,7 +231,7 @@ class _ChatState extends State<Chat> {
   void processResponse(String text) {
     setState(() {
       final message = Message(
-        text: "Вот все, что удалось найти по вашему запросу:",
+        text: "Самые релевантные данные по вашему запросу:",
         sentByUser: false,
         results: [
           "Список нормативных актов",
@@ -181,7 +245,7 @@ class _ChatState extends State<Chat> {
     });
   }
 
-  void sendMessage(String text) {
+  void sendMessage(String text, bool byUser, List<String> results) {
     if (isBlank(text)) {
       return;
     }
@@ -189,13 +253,18 @@ class _ChatState extends State<Chat> {
     setState(() {
       final message = Message(
         text: text,
-        sentByUser: true,
-        results: [],
+        sentByUser: byUser,
+        results: results,
       );
 
       chat.messages.add(message);
       storageProvider.saveChat(chat);
-      processResponse(text);
+
+      if (byUser) {
+        processResponse(text);
+      } else {
+        _scrollDown();
+      }
     });
   }
 
@@ -206,6 +275,7 @@ class _ChatState extends State<Chat> {
       body: CupertinoPageScaffold(
         child: CustomScrollView(
           keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+          shrinkWrap: true,
           controller: _controller,
           slivers: [
             CupertinoSliverNavigationBar(
@@ -226,22 +296,34 @@ class _ChatState extends State<Chat> {
             ),
             SliverFillRemaining(
               hasScrollBody: false,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      verticalDirection: VerticalDirection.down,
-                      children: [
-                        ...chat.messages.map(
-                          (e) => chatCard(e.text, e.sentByUser, e.results),
-                        )
-                      ],
-                    ),
-                  ),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  verticalDirection: VerticalDirection.down,
+                  children: [
+                    if (chat.messages.isEmpty)
+                      Expanded(
+                        child: Center(
+                          child: ConstrainedBox(
+                            constraints: BoxConstraints(maxHeight: 300),
+                            child: Text(
+                              "Сообщений пока нет: напишите любой вопрос и бот даст на него ответ",
+                              softWrap: true,
+                              maxLines: 3,
+                              style: GoogleFonts.ptSerif(fontSize: 18),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    ...chat.messages.map(
+                      (e) => chatCard(e.text, e.sentByUser, e.results),
+                    )
+                  ],
+                ),
               ),
             ),
           ],

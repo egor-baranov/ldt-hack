@@ -116,12 +116,12 @@ class _LoginState extends State<Login> {
               children: [
                 SizedBox(height: 16),
                 Text(
-                  "Вход в личный кабинет",
+                  "Вход в аккаунт",
                   style: GoogleFonts.ptSerif(fontSize: 32),
                 ),
                 SizedBox(height: 8),
                 const Text(
-                  "Для входа в личный кабинет выберите полномочие и авторизуйтесь",
+                  "Для входа в аккаунт выберите полномочие и авторизуйтесь",
                   style: TextStyle(fontWeight: FontWeight.w300, fontSize: 16),
                 ),
                 Spacer(),

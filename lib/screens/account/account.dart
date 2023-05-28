@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lodt_hack/providers/LocalStorageProvider.dart';
 import 'package:lodt_hack/screens/account/edit_account.dart';
+import 'package:lodt_hack/screens/info.dart';
 import 'package:lodt_hack/utils/parser.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../../models/User.dart';
+import '../../models/consultation/Consultation.dart';
 import '../../styles/ColorResources.dart';
 import '../auth/login.dart';
 
@@ -37,6 +39,46 @@ class _AccountState extends State<Account> {
 
   @override
   Widget build(BuildContext context) {
+    Widget accountSettingsCard(String text, IconData icon) {
+      return Material(
+        color: CupertinoColors.systemGrey6,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: InkWell(
+          borderRadius: const BorderRadius.all(Radius.circular(16)),
+          onTap: () => Navigator.push(
+            context,
+            CupertinoPageRoute(
+              builder: (context) => Info(
+                title: text,
+                description: text,
+                externalLink: text,
+                subtitle: '',
+              ),
+            ),
+          ),
+          child: SizedBox(
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Icon(icon, size: 20),
+                      SizedBox(width: 16),
+                      Text(text, style: GoogleFonts.inter(fontSize: 16)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     Widget accountCard(String type, String? text) {
       return Material(
         color: CupertinoColors.systemGrey6,
@@ -67,6 +109,109 @@ class _AccountState extends State<Account> {
       );
     }
 
+    void showSettings() {
+      showCupertinoModalBottomSheet(
+        context: context,
+        builder: (context) => Scaffold(
+          persistentFooterAlignment: AlignmentDirectional.center,
+          body: Container(
+            child: Stack(
+              children: <Widget>[
+                Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 16),
+                      Text(
+                        "Настройки",
+                        style: GoogleFonts.ptSerif(fontSize: 32),
+                      ),
+                      const SizedBox(height: 32),
+                      accountSettingsCard(
+                          "Журнал о контроле", Icons.list_alt_rounded),
+                      const SizedBox(height: 16),
+                      accountSettingsCard("Настройки уведомлений",
+                          Icons.notifications_outlined),
+                      const SizedBox(height: 16),
+                      accountSettingsCard(
+                          "Сообщить об ошибке", Icons.bug_report_outlined),
+                      const SizedBox(height: 16),
+                      accountSettingsCard("Помощь и поддержка", Icons.support),
+                      const SizedBox(height: 16),
+                      accountSettingsCard(
+                          "О приложении", CupertinoIcons.info_circle),
+                      const SizedBox(height: 32),
+                      SizedBox(
+                        height: 48,
+                        width: double.infinity,
+                        child: CupertinoButton(
+                          color: CupertinoColors.systemGrey5,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) => Login(
+                                  onChangeFlow: () {},
+                                ),
+                              ),
+                            );
+                          },
+                          child: const Text("Выйти из аккаунта",
+                              style: TextStyle(color: Colors.black)),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: 48,
+                        width: double.infinity,
+                        child: CupertinoButton(
+                          color: CupertinoColors.systemGrey5,
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              CupertinoPageRoute(
+                                builder: (context) => Login(
+                                  onChangeFlow: () {},
+                                ),
+                              ),
+                            );
+                          },
+                          child: const Text("Удалить аккаунт",
+                              style: TextStyle(color: Colors.black)),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Positioned(
+                  right: 12,
+                  top: 12,
+                  child: SizedBox(
+                    width: 32,
+                    height: 32,
+                    child: CupertinoButton(
+                      padding: EdgeInsets.all(0),
+                      borderRadius: BorderRadius.circular(64),
+                      color: CupertinoColors.systemGrey5,
+                      onPressed: () => Navigator.of(context).popUntil(
+                        (route) => route.settings.name == '/',
+                      ),
+                      child: const Icon(
+                        Icons.close,
+                        size: 20,
+                        color: CupertinoColors.darkBackgroundGray,
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return CupertinoPageScaffold(
       child: CustomScrollView(
         slivers: [
@@ -79,91 +224,7 @@ class _AccountState extends State<Account> {
               child: IconButton(
                 icon: const Icon(CupertinoIcons.settings_solid),
                 onPressed: () {
-                  showCupertinoModalBottomSheet(
-                    context: context,
-                    builder: (context) => Scaffold(
-                      persistentFooterAlignment: AlignmentDirectional.center,
-                      body: Container(
-                        child: Stack(
-                          children: <Widget>[
-                            Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  SizedBox(height: 16),
-                                  Text(
-                                    "Настройки",
-                                    style: GoogleFonts.ptSerif(fontSize: 32),
-                                  ),
-                                  SizedBox(height: 160),
-                                  SizedBox(
-                                    height: 48,
-                                    width: double.infinity,
-                                    child: CupertinoButton(
-                                      color: ColorResources.accentRed,
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          CupertinoPageRoute(
-                                            builder: (context) => Login(
-                                              onChangeFlow: () {},
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Text("Выйти из аккаунта"),
-                                    ),
-                                  ),
-                                  SizedBox(height: 8),
-                                  SizedBox(
-                                    height: 48,
-                                    width: double.infinity,
-                                    child: CupertinoButton(
-                                      color: ColorResources.accentRed,
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          CupertinoPageRoute(
-                                            builder: (context) => Login(
-                                              onChangeFlow: () {},
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      child: Text("Удалить аккаунт"),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Positioned(
-                              right: 12,
-                              top: 12,
-                              child: SizedBox(
-                                width: 32,
-                                height: 32,
-                                child: CupertinoButton(
-                                  padding: EdgeInsets.all(0),
-                                  borderRadius: BorderRadius.circular(64),
-                                  color: CupertinoColors.systemGrey5,
-                                  onPressed: () =>
-                                      Navigator.of(context).popUntil(
-                                    (route) => route.settings.name == '/',
-                                  ),
-                                  child: const Icon(
-                                    Icons.close,
-                                    size: 20,
-                                    color: CupertinoColors.darkBackgroundGray,
-                                  ),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
+                  showSettings();
                 },
               ),
             ),

@@ -223,7 +223,7 @@ class _RegisterState extends State<Register> {
                       return null;
                     }, (text) {
                       user.email = text;
-                    }, false, MaskedInputFormatter("00.00.0000")),
+                    }, false),
                     SizedBox(height: 8),
                     textField("Пароль", (value) {
                       if (isBlank(value)) {

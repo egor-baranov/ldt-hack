@@ -60,21 +60,29 @@ class User {
   Passport? passport;
   String? userType;
 
-  User(
-      [this.firstName,
-      this.lastName,
-      this.userType,
-      this.patronymic,
-      this.passport,
-      this.inn,
-      this.snils,
-      this.sex,
-      this.birthDate,
-      this.birthPlace,
-      this.phone,
-      this.email,
-      this.password,
-      this.businessName]);
+  String? authorityName;
+
+  User([
+    this.firstName,
+    this.lastName,
+    this.userType,
+    this.patronymic,
+    this.passport,
+    this.inn,
+    this.snils,
+    this.sex,
+    this.birthDate,
+    this.birthPlace,
+    this.phone,
+    this.email,
+    this.password,
+    this.businessName,
+    this.authorityName,
+  ]);
+
+  bool isBusiness() {
+    return userType != 'Инспектор';
+  }
 
   User.fromBusinessUser(BusinessUser businessUser) {
     firstName = businessUser.firstName;
@@ -84,6 +92,12 @@ class User {
     birthDate = stringFromTimestamp(businessUser.birthDate);
     phone = businessUser.phoneNumber;
     sex = businessUser.sex == PersonSex.PERSON_SEX_MALE ? "Мужской" : "Женский";
+  }
+
+  User.fromAuthorityUser(AuthorityUser authorityUser) {
+    firstName = authorityUser.firstName;
+    lastName = authorityUser.lastName;
+    patronymic = authorityUser.authorityName;
   }
 
   User.fromJson(Map<String, dynamic> json) {
@@ -102,6 +116,7 @@ class User {
     email = json['email'];
     password = json['password'];
     userType = json['user_type'];
+    authorityName = json['authority_name'];
   }
 
   Map<String, dynamic> toJson() {
@@ -120,7 +135,7 @@ class User {
       'phone': phone,
       'email': email,
       'password': password,
-      'userType': userType,
+      'authority_name': authorityName,
     };
   }
 }

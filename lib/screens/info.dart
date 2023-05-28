@@ -14,12 +14,14 @@ class Info extends StatefulWidget {
     required this.subtitle,
     required this.description,
     required this.externalLink,
+    required this.buttonLabel
   });
 
   final String title;
   final String subtitle;
   final String description;
   final String externalLink;
+  final String buttonLabel;
 
   @override
   State<Info> createState() => _InfoState();
@@ -76,9 +78,9 @@ class _InfoState extends State<Info> {
                           onPressed: () {
                             launchUrl(Uri.parse(widget.externalLink));
                           },
-                          child: const Text(
-                            "Перейти на сайт",
-                            style: TextStyle(
+                          child: Text(
+                            widget.buttonLabel,
+                            style: const TextStyle(
                               color: ColorResources.white,
                             ),
                           ),

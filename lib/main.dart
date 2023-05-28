@@ -1,9 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lodt_hack/providers/LocalStorageProvider.dart';
 import 'package:lodt_hack/screens/account/account.dart';
 import 'package:lodt_hack/screens/auth/auth.dart';
+import 'package:lodt_hack/screens/auth/login.dart';
+import 'package:lodt_hack/screens/info.dart';
 import 'package:lodt_hack/styles/ColorResources.dart';
 
+import 'models/User.dart';
 import 'screens/chat.dart';
 import 'screens/dashboard.dart';
 import 'screens/zoom.dart';
@@ -36,10 +40,92 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _selectedIndex = 0;
 
+  User? user;
+  String? token;
+
+  void fetchData() {
+    storageProvider.getUser().then(
+          (value) => setState(
+            () {
+              if (value == null) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => Auth(),
+                  ),
+                  (r) => false,
+                );
+              } else {
+                user = value;
+              }
+              print(user);
+            },
+          ),
+        );
+    storageProvider.getToken().then(
+          (value) => setState(
+            () {
+              if (value == null) {
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => Auth(),
+                  ),
+                  (r) => false,
+                );
+              } else {
+                token = value;
+              }
+            },
+          ),
+        );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  List<BottomNavigationBarItem> bottomNavBar() {
+    var result = [
+      const BottomNavigationBarItem(
+        icon: Icon(CupertinoIcons.square_list_fill),
+        label: "Главная",
+        backgroundColor: CupertinoColors.systemGrey6,
+      )
+    ];
+
+    if (user != null && user!.isBusiness()) {
+      result += [
+        const BottomNavigationBarItem(
+          icon: Icon(CupertinoIcons.chat_bubble_text_fill),
+          label: "Чат",
+          backgroundColor: CupertinoColors.systemGrey6,
+        ),
+      ];
+    }
+
+    result += [
+      const BottomNavigationBarItem(
+        icon: Icon(CupertinoIcons.videocam_fill),
+        label: "Консультации",
+        backgroundColor: CupertinoColors.systemGrey6,
+      ),
+      const BottomNavigationBarItem(
+        icon: Icon(CupertinoIcons.profile_circled),
+        label: "Профиль",
+        backgroundColor: CupertinoColors.systemGrey6,
+      ),
+    ];
+
+    return result;
   }
 
   @override
@@ -54,45 +140,38 @@ class _MyHomePageState extends State<MyHomePage> {
             setState(() {
               Navigator.push(
                 context,
-                CupertinoPageRoute(builder: (context) => Auth()),
+                CupertinoPageRoute(
+                  builder: (context) => const Info(
+                    title: "Поиск по приложению",
+                    subtitle:
+                        "Ищите любую информацию из приложения в одном удобном месте",
+                    description:
+                        "В данный момент функция находится в стадии разработки",
+                    externalLink: "https://google.com",
+                    buttonLabel: "Найти",
+                  ),
+                ),
               );
             });
           },
           onOpenZoom: () {
-            setState(() {
-              _selectedIndex = 2;
-            });
+            setState(
+              () {
+                user != null && user!.isBusiness()
+                    ? _selectedIndex = 2
+                    : _selectedIndex = 1;
+              },
+            );
           },
         ),
-        Chat(),
-        Zoom(),
-        Account()
+        if (user != null && user!.isBusiness()) Chat(),
+        const Zoom(),
+        const Account()
       ][_selectedIndex]),
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: ColorResources.accentRed,
         unselectedItemColor: CupertinoColors.systemGrey,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.square_list_fill),
-            label: "Главная",
-            backgroundColor: CupertinoColors.systemGrey6,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.chat_bubble_text_fill),
-            label: "Чат",
-            backgroundColor: CupertinoColors.systemGrey6,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.videocam_fill),
-            label: "Консультации",
-            backgroundColor: CupertinoColors.systemGrey6,
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(CupertinoIcons.profile_circled),
-            label: "Профиль",
-            backgroundColor: CupertinoColors.systemGrey6,
-          ),
-        ],
+        items: bottomNavBar(),
         showSelectedLabels: true,
         showUnselectedLabels: true,
         currentIndex: _selectedIndex,

@@ -1,12 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lodt_hack/clients/ApiClient.dart';
 import 'package:lodt_hack/providers/LocalStorageProvider.dart';
 
+import '../generated/app.pb.dart';
 import '../models/chat/Chat.dart';
 import '../models/chat/Message.dart';
 import '../styles/ColorResources.dart';
 import '../utils/parser.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:grpc/grpc.dart';
+
+import 'info.dart';
 
 class Chat extends StatefulWidget {
   const Chat({super.key});
@@ -20,6 +25,7 @@ class _ChatState extends State<Chat> {
   final _inputController = TextEditingController();
 
   ChatHolder chat = ChatHolder([]);
+  String? token;
 
   @override
   void initState() {
@@ -39,6 +45,13 @@ class _ChatState extends State<Chat> {
                   );
                 },
               );
+            },
+          ),
+        );
+    storageProvider.getToken().then(
+          (value) => setState(
+            () {
+              token = value!;
             },
           ),
         );
@@ -228,21 +241,51 @@ class _ChatState extends State<Chat> {
     );
   }
 
-  void processResponse(String text) {
-    setState(() {
-      final message = Message(
-        text: "Самые релевантные данные по вашему запросу:",
-        sentByUser: false,
-        results: [
-          "Список нормативных актов",
-          "Список органов контроля",
-          "Список обязательных требований"
-        ],
+  void processResponse(String text) async {
+    try {
+      await apiClient
+          .sendChatBotMessage(
+            SendChatBotMessageRequest(message: text),
+            options: CallOptions(
+              metadata: {'Authorization': 'Bearer $token'},
+            ),
+          )
+          .then(
+            (p0) => {
+              p0.messages
+                  .map((e) => Message(text: e, sentByUser: false, results: []))
+                  .forEach(
+                (element) {
+                  chat.messages.add(element);
+                },
+              ),
+              setState(
+                () {
+                  storageProvider.saveChat(chat);
+                  _scrollDown();
+                },
+              )
+            },
+          );
+    } on GrpcError catch (e) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text("Ошибка отправки сообщения"),
+            content: Text(e.message ?? "Текст ошибки отсутствует"),
+            actions: [
+              TextButton(
+                child: Text("Продолжить"),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
       );
-      chat.messages.add(message);
-      storageProvider.saveChat(chat);
-      _scrollDown();
-    });
+    }
   }
 
   void sendMessage(String text, bool byUser, List<String> results) {
@@ -286,7 +329,22 @@ class _ChatState extends State<Chat> {
               trailing: Material(
                 child: IconButton(
                   onPressed: () {
-                    // widget.onSearch();
+                    setState(() {
+                      Navigator.push(
+                        context,
+                        CupertinoPageRoute(
+                          builder: (context) => const Info(
+                            title: "Поиск по чату",
+                            subtitle:
+                                "Производите поиск по сообщениям в диалоге с чат-ботом",
+                            description:
+                                "В данный момент функция находится в стадии разработки",
+                            externalLink: "https://google.com",
+                            buttonLabel: "Найти",
+                          ),
+                        ),
+                      );
+                    });
                   },
                   iconSize: 28,
                   color: CupertinoColors.darkBackgroundGray,
@@ -306,19 +364,31 @@ class _ChatState extends State<Chat> {
                     if (chat.messages.isEmpty)
                       Expanded(
                         child: Center(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(maxHeight: 300),
-                            child: Text(
-                              "Сообщений пока нет: напишите любой вопрос и бот даст на него ответ",
-                              softWrap: true,
-                              maxLines: 3,
-                              style: GoogleFonts.ptSerif(fontSize: 18),
-                              textAlign: TextAlign.center,
-                            ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                "Сообщений пока нет",
+                                softWrap: true,
+                                maxLines: 3,
+                                style: GoogleFonts.ptSerif(fontSize: 20),
+                                textAlign: TextAlign.center,
+                              ),
+                              SizedBox(height: 8),
+                              ConstrainedBox(
+                                constraints: BoxConstraints(maxWidth: 300),
+                                child: Text(
+                                  "Напишите любой вопрос и бот даст на него ответ",
+                                  softWrap: true,
+                                  maxLines: 3,
+                                  style: GoogleFonts.ptSerif(fontSize: 16),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
-
                     ...chat.messages.map(
                       (e) => chatCard(e.text, e.sentByUser, e.results),
                     )

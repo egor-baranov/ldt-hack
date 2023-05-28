@@ -1,15 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:lodt_hack/clients/ApiClient.dart';
 import 'package:lodt_hack/providers/LocalStorageProvider.dart';
 import 'package:lodt_hack/screens/account/edit_account.dart';
 import 'package:lodt_hack/screens/info.dart';
 import 'package:lodt_hack/utils/parser.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import '../../generated/google/protobuf/empty.pb.dart';
 import '../../models/User.dart';
 import '../../models/consultation/Consultation.dart';
 import '../../styles/ColorResources.dart';
+import '../auth/auth.dart';
 import '../auth/login.dart';
+import 'package:grpc/grpc.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class Account extends StatefulWidget {
   const Account({super.key});
@@ -19,13 +24,21 @@ class Account extends StatefulWidget {
 }
 
 class _AccountState extends State<Account> {
-  User? user;
+  User user = User();
+  String? token;
 
   void fetchData() {
     storageProvider.getUser().then(
           (value) => setState(
             () {
-              user = value;
+              user = value!;
+            },
+          ),
+        );
+    storageProvider.getToken().then(
+          (value) => setState(
+            () {
+              token = value!;
             },
           ),
         );
@@ -37,25 +50,93 @@ class _AccountState extends State<Account> {
     fetchData();
   }
 
+  void logout() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text("Вы уверены, что хотите выйти из аккаунта?"),
+          content: Text("Это повлечет за собой очистку локальных данных"),
+          actions: [
+            TextButton(
+              child:
+                  const Text("Продолжить", style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                storageProvider.clearData();
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  CupertinoPageRoute(
+                    builder: (context) => Auth(),
+                  ),
+                  (r) => false,
+                );
+              },
+            ),
+            TextButton(
+              child: Text("Отмена"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
+
+  void deleteAccount() {
+    showDialog(
+      context: context,
+      builder: (BuildContext builder) {
+        return AlertDialog(
+          title: Text("Вы уверены, что хотите удалить аккаунт?"),
+          content: Text("Эту операцию невозможно будет отменить"),
+          actions: [
+            TextButton(
+              child:
+                  const Text("Продолжить", style: TextStyle(color: Colors.red)),
+              onPressed: () async {
+                await apiClient
+                    .deleteBusinessUser(
+                      Empty(),
+                      options: CallOptions(
+                        metadata: {'Authorization': 'Bearer $token'},
+                      ),
+                    )
+                    .then(
+                      (p0) => {
+                        storageProvider.clearData(),
+                        Navigator.pushAndRemoveUntil(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => Auth(),
+                            ),
+                            (r) => false)
+                      },
+                    );
+              },
+            ),
+            TextButton(
+              child: Text("Отмена"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    Widget accountSettingsCard(String text, IconData icon) {
+    Widget accountSettingsCard(String text, IconData icon, Function onTap) {
       return Material(
         color: CupertinoColors.systemGrey6,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: InkWell(
           borderRadius: const BorderRadius.all(Radius.circular(16)),
-          onTap: () => Navigator.push(
-            context,
-            CupertinoPageRoute(
-              builder: (context) => Info(
-                title: text,
-                description: text,
-                externalLink: text,
-                subtitle: '',
-              ),
-            ),
-          ),
+          onTap: () => onTap(),
           child: SizedBox(
             width: double.infinity,
             child: Padding(
@@ -124,23 +205,105 @@ class _AccountState extends State<Account> {
                     children: [
                       SizedBox(height: 16),
                       Text(
-                        "Настройки",
+                        "Параметры",
                         style: GoogleFonts.ptSerif(fontSize: 32),
                       ),
                       const SizedBox(height: 32),
                       accountSettingsCard(
-                          "Журнал о контроле", Icons.list_alt_rounded),
-                      const SizedBox(height: 16),
-                      accountSettingsCard("Настройки уведомлений",
-                          Icons.notifications_outlined),
+                        "Журнал о контроле",
+                        Icons.list_alt_rounded,
+                        () {
+                          launchUrl(
+                            Uri.parse(
+                              'https://knd.mos.ru/news/categories/article',
+                            ),
+                          );
+                        },
+                      ),
                       const SizedBox(height: 16),
                       accountSettingsCard(
-                          "Сообщить об ошибке", Icons.bug_report_outlined),
-                      const SizedBox(height: 16),
-                      accountSettingsCard("Помощь и поддержка", Icons.support),
+                        "Настройки уведомлений",
+                        Icons.notifications_outlined,
+                        () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => const Info(
+                                title: 'Настройки уведомлений',
+                                description:
+                                    'В данный момент функция находится в стадии разработки',
+                                externalLink: '',
+                                subtitle:
+                                    'Удобно управляйте уведомлениями приложения',
+                                buttonLabel: 'Подтвердить',
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                       const SizedBox(height: 16),
                       accountSettingsCard(
-                          "О приложении", CupertinoIcons.info_circle),
+                        "Сообщить об ошибке",
+                        Icons.bug_report_outlined,
+                        () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => const Info(
+                                title: 'Сообщить об ошибке',
+                                description:
+                                    'В данный момент функция находится в стадии разработки',
+                                externalLink: '',
+                                subtitle:
+                                    'Это поможет разработчикам сделать приложение еще удобнее и стабильнее',
+                                buttonLabel: 'Отправить',
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      accountSettingsCard(
+                        "Помощь и поддержка",
+                        Icons.support,
+                        () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => const Info(
+                                title: 'Помощь и поддержка',
+                                description:
+                                    'В данный момент функция находится в стадии разработки',
+                                externalLink: '',
+                                subtitle:
+                                    'При возникновении проблем обратитесь в службу помощи и поддержки приложения',
+                                buttonLabel: 'Отправить',
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      accountSettingsCard(
+                        "О приложении",
+                        CupertinoIcons.info_circle,
+                        () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (context) => const Info(
+                                title: 'О приложении',
+                                description:
+                                    'Трек "Мобильное приложение для прохождения предпринимателями проверок контрольных органов" в рамках хакатона Leaders of Digital Transformation',
+                                externalLink:
+                                    'https://github.com/skcusltf/ldt-hack-2023',
+                                subtitle: 'Проект разработан командой skcusltf',
+                                buttonLabel: 'Ссылка на репозиторий',
+                              ),
+                            ),
+                          );
+                        },
+                      ),
                       const SizedBox(height: 32),
                       SizedBox(
                         height: 48,
@@ -148,39 +311,26 @@ class _AccountState extends State<Account> {
                         child: CupertinoButton(
                           color: CupertinoColors.systemGrey5,
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => Login(
-                                  onChangeFlow: () {},
-                                ),
-                              ),
-                            );
+                            logout();
                           },
                           child: const Text("Выйти из аккаунта",
                               style: TextStyle(color: Colors.black)),
                         ),
                       ),
                       const SizedBox(height: 16),
-                      SizedBox(
-                        height: 48,
-                        width: double.infinity,
-                        child: CupertinoButton(
-                          color: CupertinoColors.systemGrey5,
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              CupertinoPageRoute(
-                                builder: (context) => Login(
-                                  onChangeFlow: () {},
-                                ),
-                              ),
-                            );
-                          },
-                          child: const Text("Удалить аккаунт",
-                              style: TextStyle(color: Colors.black)),
+                      if (user!.userType != 'Инспектор')
+                        SizedBox(
+                          height: 48,
+                          width: double.infinity,
+                          child: CupertinoButton(
+                            color: Colors.red,
+                            onPressed: () {
+                              deleteAccount();
+                            },
+                            child: const Text("Удалить аккаунт",
+                                style: TextStyle(color: Colors.white)),
+                          ),
                         ),
-                      ),
                     ],
                   ),
                 ),
@@ -212,107 +362,119 @@ class _AccountState extends State<Account> {
       );
     }
 
-    return CupertinoPageScaffold(
-      child: CustomScrollView(
-        slivers: [
-          CupertinoSliverNavigationBar(
-            largeTitle: Text(
-              "Профиль",
-              style: GoogleFonts.ptSerif(fontWeight: FontWeight.w100),
-            ),
-            trailing: Material(
-              child: IconButton(
-                icon: const Icon(CupertinoIcons.settings_solid),
-                onPressed: () {
-                  showSettings();
-                },
+    return Scaffold(
+      body: CupertinoPageScaffold(
+        child: CustomScrollView(
+          slivers: [
+            CupertinoSliverNavigationBar(
+              largeTitle: Text(
+                "Профиль",
+                style: GoogleFonts.ptSerif(fontWeight: FontWeight.w100),
+              ),
+              trailing: Material(
+                child: IconButton(
+                  icon: const Icon(CupertinoIcons.settings_solid),
+                  onPressed: () {
+                    showSettings();
+                  },
+                ),
               ),
             ),
-          ),
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                verticalDirection: VerticalDirection.down,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (_) => EditAccount(initialUser: user!),
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  verticalDirection: VerticalDirection.down,
+                  children: [
+                    if (user.isBusiness())
+                      TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            CupertinoPageRoute(
+                              builder: (_) => EditAccount(initialUser: user!),
+                            ),
+                          ).then((value) => fetchData());
+                        },
+                        child: Text("Редактировать данные"),
+                        style: ButtonStyle(
+                          foregroundColor: MaterialStateProperty.all(
+                              ColorResources.accentRed),
+                          overlayColor: MaterialStateProperty.all(
+                            ColorResources.accentRed.withOpacity(0.1),
+                          ),
                         ),
-                      ).then((value) => fetchData());
-                    },
-                    child: Text("Редактировать данные"),
-                    style: ButtonStyle(
-                      foregroundColor:
-                          MaterialStateProperty.all(ColorResources.accentRed),
-                      overlayColor: MaterialStateProperty.all(
-                        ColorResources.accentRed.withOpacity(0.1),
                       ),
+                    if (user!.isBusiness()) SizedBox(height: 16),
+                    if (user!.isBusiness())
+                      accountCard("Название бизнеса", user?.businessName),
+                    SizedBox(height: 16),
+                    accountCard("Род деятельности",
+                        user?.userType ?? "Предприниматель"),
+                    SizedBox(height: 32),
+                    Text(
+                      "Контактные данные",
+                      style: GoogleFonts.ptSerif(fontSize: 24),
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  accountCard("Название бизнеса", user?.businessName),
-                  SizedBox(height: 16),
-                  accountCard(
-                      "Род деятельности", user?.userType ?? "Предприниматель"),
-                  SizedBox(height: 32),
-                  Text(
-                    "Контактные данные",
-                    style: GoogleFonts.ptSerif(fontSize: 24),
-                  ),
-                  SizedBox(height: 8),
-                  accountCard("Телефон", user?.phone),
-                  SizedBox(height: 8),
-                  accountCard("Адрес электронной почты", user?.email),
-                  SizedBox(height: 32),
-                  Text(
-                    "Основные данные",
-                    style: GoogleFonts.ptSerif(fontSize: 24),
-                  ),
-                  SizedBox(height: 8),
-                  accountCard("Фамилия", user?.lastName),
-                  SizedBox(height: 8),
-                  accountCard("Имя", user?.firstName),
-                  SizedBox(height: 8),
-                  accountCard("Отчество", user?.patronymic),
-                  SizedBox(height: 8),
-                  accountCard("ИНН", user?.inn),
-                  SizedBox(height: 8),
-                  accountCard("СНИЛС", user?.snils),
-                  SizedBox(height: 8),
-                  accountCard("Пол", user?.sex),
-                  SizedBox(height: 8),
-                  accountCard("Дата рождения", user?.birthDate),
-                  SizedBox(height: 8),
-                  accountCard("Место рождения", user?.birthPlace),
-                  SizedBox(height: 32),
-                  Text(
-                    "Паспортные данные",
-                    style: GoogleFonts.ptSerif(fontSize: 24),
-                  ),
-                  SizedBox(height: 8),
-                  accountCard("Серия", user?.passport?.series),
-                  SizedBox(height: 8),
-                  accountCard("Номер", user?.passport?.number),
-                  SizedBox(height: 8),
-                  accountCard("Дата выдачи", user?.passport?.date),
-                  SizedBox(height: 8),
-                  accountCard("Кем выдан", user?.passport?.place),
-                  SizedBox(height: 8),
-                  accountCard(
-                      "Адрес регистрации", user?.passport?.registration),
-                  SizedBox(height: 16),
-                ],
+                    if (user!.isBusiness()) SizedBox(height: 8),
+                    if (user!.isBusiness()) accountCard("Телефон", user?.phone),
+                    SizedBox(height: 8),
+                    accountCard("Адрес электронной почты", user?.email),
+                    SizedBox(height: 32),
+                    Text(
+                      "Основные данные",
+                      style: GoogleFonts.ptSerif(fontSize: 24),
+                    ),
+                    SizedBox(height: 8),
+                    accountCard("Фамилия", user?.lastName),
+                    SizedBox(height: 8),
+                    accountCard("Имя", user?.firstName),
+                    if (user!.isBusiness())
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        verticalDirection: VerticalDirection.down,
+                        children: [
+                          SizedBox(height: 8),
+                          accountCard("Отчество", user?.patronymic),
+                          SizedBox(height: 8),
+                          accountCard("ИНН", user?.inn),
+                          SizedBox(height: 8),
+                          accountCard("СНИЛС", user?.snils),
+                          SizedBox(height: 8),
+                          accountCard("Пол", user?.sex),
+                          SizedBox(height: 8),
+                          accountCard("Дата рождения", user?.birthDate),
+                          SizedBox(height: 8),
+                          accountCard("Место рождения", user?.birthPlace),
+                          SizedBox(height: 32),
+                          Text(
+                            "Паспортные данные",
+                            style: GoogleFonts.ptSerif(fontSize: 24),
+                          ),
+                          SizedBox(height: 8),
+                          accountCard("Серия", user?.passport?.series),
+                          SizedBox(height: 8),
+                          accountCard("Номер", user?.passport?.number),
+                          SizedBox(height: 8),
+                          accountCard("Дата выдачи", user?.passport?.date),
+                          SizedBox(height: 8),
+                          accountCard("Кем выдан", user?.passport?.place),
+                          SizedBox(height: 8),
+                          accountCard("Адрес регистрации",
+                              user?.passport?.registration),
+                        ],
+                      ),
+                    SizedBox(height: 16),
+                  ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

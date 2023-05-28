@@ -29,7 +29,8 @@ class _CallState extends State<Call> {
       username: "user" + Random.secure().nextInt(1000).toString(),
       appId: "faa5e42e20664f2e8090edd45ae9b1a6",
       channelName: "test",
-      tempToken: "007eJxTYCjcJSPG+XrL3DuJcdutN3E+neHUL6C6eWaJ88x5K7QT79srMKQlJpqmmhilGhmYmZmkGaVaGFgapKakmJgmplomGSaa1aUUpDQEMjJM1YlgZmSAQBCfhaEktbiEgQEAGOMelA==",
+      tempToken:
+          "007eJxTYCjcJSPG+XrL3DuJcdutN3E+neHUL6C6eWaJ88x5K7QT79srMKQlJpqmmhilGhmYmZmkGaVaGFgapKakmJgmplomGSaa1aUUpDQEMjJM1YlgZmSAQBCfhaEktbiEgQEAGOMelA==",
     ),
   );
 
@@ -142,12 +143,24 @@ class _CallState extends State<Call> {
               ),
               AgoraVideoButtons(
                 client: client,
+                cloudRecordingEnabled: true,
                 addScreenSharing: false,
+                buttonAlignment: Alignment.bottomCenter,
+                // muteButtonChild: CupertinoButton(
+                //   onPressed: () {},
+                //   color: Colors.redAccent,
+                //   child: Icon(Icons.volume_mute_outlined),
+                //   padding: EdgeInsets.all(4),
+                // ),
+                // disconnectButtonChild: Text("disconnect"),
+                // switchCameraButtonChild: Text("switch"),
+                // disableVideoButtonChild: Text("disable"),
                 enabledButtons: [
                   BuiltInButtons.toggleMic,
                   BuiltInButtons.callEnd,
                   BuiltInButtons.toggleCamera,
-                ],// Add this to enable screen sharing
+                  BuiltInButtons.switchCamera,
+                ],
               ),
             ],
           ),

@@ -7,6 +7,7 @@ import 'package:lodt_hack/utils/calendar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../models/User.dart';
 import '../models/consultation/Consultation.dart';
 import '../models/consultation/ConsultationHolder.dart';
 import '../providers/LocalStorageProvider.dart';
@@ -16,7 +17,8 @@ import 'consultation.dart';
 import 'info.dart';
 
 class Dashboard extends StatefulWidget {
-  const Dashboard({super.key, required this.onSearch, required this.onOpenZoom});
+  const Dashboard(
+      {super.key, required this.onSearch, required this.onOpenZoom});
 
   final Function onSearch;
   final Function onOpenZoom;
@@ -30,6 +32,8 @@ class _DashboardState extends State<Dashboard> {
     DateTime.now(),
   ];
   ConsultationHolder consultations = ConsultationHolder([]);
+  User user = User();
+  String? token;
 
   void fetchData() {
     storageProvider.getConsultations().then(
@@ -37,6 +41,20 @@ class _DashboardState extends State<Dashboard> {
             () {
               consultations = value;
               print(consultations.toJson());
+            },
+          ),
+        );
+    storageProvider.getUser().then(
+          (value) => setState(
+            () {
+              user = value!;
+            },
+          ),
+        );
+    storageProvider.getToken().then(
+          (value) => setState(
+            () {
+              token = value!;
             },
           ),
         );
@@ -98,22 +116,22 @@ class _DashboardState extends State<Dashboard> {
       ),
     );
   }
-  
+
   int abs(int v) {
     if (v < 0) {
       return -v;
     }
-    
+
     return v;
   }
 
   List<ConsultationModel> sorted(List<ConsultationModel> c) {
-    c.sort((a, b) => abs(dateFromString(a.day!)
-        .toDateTime().day - DateTime.now().day)
-        .compareTo(abs(dateFromString(b.day!).toDateTime().day - DateTime.now().day)));
+    c.sort((a, b) => abs(
+            dateFromString(a.day!).toDateTime().day - DateTime.now().day)
+        .compareTo(
+            abs(dateFromString(b.day!).toDateTime().day - DateTime.now().day)));
     return c.toList();
   }
-
 
   Widget dashboardCard(
     String title,
@@ -134,6 +152,7 @@ class _DashboardState extends State<Dashboard> {
               description: description,
               externalLink: externalLink,
               subtitle: subtitle,
+              buttonLabel: "Перейти на сайт",
             ),
           ),
         ),
@@ -205,41 +224,6 @@ class _DashboardState extends State<Dashboard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   verticalDirection: VerticalDirection.down,
                   children: [
-                    TextButton(
-                      onPressed: () {
-                        showDatePicker(
-                          builder: (context, child) {
-                            return Theme(
-                              data: Theme.of(context).copyWith(
-                                colorScheme: const ColorScheme.light(
-                                  primary: ColorResources.accentRed,
-                                  onPrimary: Colors.white,
-                                  onSurface: Colors.black,
-                                ),
-                                textButtonTheme: TextButtonThemeData(
-                                  style: TextButton.styleFrom(
-                                    foregroundColor: ColorResources.accentRed,
-                                  ),
-                                ),
-                              ),
-                              child: child!,
-                            );
-                          },
-                          context: context,
-                          firstDate: DateTime.parse("1900-01-01"),
-                          lastDate: DateTime.parse("2300-12-31"),
-                          initialDate: DateTime.now(),
-                        );
-                      },
-                      child: Text("Открыть календарь"),
-                      style: ButtonStyle(
-                        foregroundColor:
-                            MaterialStateProperty.all(ColorResources.accentRed),
-                        overlayColor: MaterialStateProperty.all(
-                          ColorResources.accentRed.withOpacity(0.1),
-                        ),
-                      ),
-                    ),
                     SizedBox(height: 32),
                     ExpandablePanel(
                       header: Text(
@@ -278,7 +262,9 @@ class _DashboardState extends State<Dashboard> {
                               child: ConstrainedBox(
                                 constraints: BoxConstraints(maxHeight: 300),
                                 child: Text(
-                                  "Вы пока не записались ни на одну консультацию",
+                                  user.isBusiness()
+                                      ? "Вы пока не записались ни на одну консультацию"
+                                      : "В данный момент вы не записаны в качестве инспектора на какую-либо консультацию",
                                   softWrap: true,
                                   maxLines: 3,
                                   style: GoogleFonts.ptSerif(fontSize: 18),
@@ -288,19 +274,19 @@ class _DashboardState extends State<Dashboard> {
                             ),
                           ...sorted(consultations.consultations).take(5).map(
                                 (e) => Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  formatDate(e.day!),
-                                  textAlign: TextAlign.left,
-                                  style: GoogleFonts.ptSerif(fontSize: 24),
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      formatDate(e.day!),
+                                      textAlign: TextAlign.left,
+                                      style: GoogleFonts.ptSerif(fontSize: 24),
+                                    ),
+                                    SizedBox(height: 4),
+                                    zoomCard(e),
+                                    SizedBox(height: 16),
+                                  ],
                                 ),
-                                SizedBox(height: 4),
-                                zoomCard(e),
-                                SizedBox(height: 16),
-                              ],
-                            ),
-                          ),
+                              ),
                           SizedBox(height: 8),
                           SizedBox(
                             height: 48,
@@ -334,6 +320,12 @@ class _DashboardState extends State<Dashboard> {
                       ),
                       expanded: Column(
                         children: [
+                          SizedBox(height: 8),
+                          dashboardCard(
+                              "Нормативный акт",
+                              'п. 1 ст. 20 Федерального закона от 22.11.1995 № 171-ФЗ "О государственном регулировании производства и оборота этилового спирта, алкогольной и спиртосодержащей продукции и об ограничении потребления (распития) алкогольной продукции": "Действие лицензии на производство и оборот этилового спирта, алкогольной и спиртосодержащей продукции приостанавливается решением лицензирующего органа на основании материалов, представленных органами, осуществляющими контроль и надзор за соблюдением настоящего Федерального закона, а также по инициативе самого лицензирующего органа в пределах его компетенции в следующих случаях: выявление нарушения, являющегося основанием для аннулирования лицензии".',
+                              'Розничная продажа алкогольной продукции без маркировки, либо с маркировкой поддельными марками запрещена.',
+                              'https://knd.mos.ru/requirements/public/8ff91444-9137-47d4-a463-92f400a33da9'),
                           SizedBox(height: 8),
                           dashboardCard(
                               "Нормативный акт",
@@ -382,16 +374,25 @@ class _DashboardState extends State<Dashboard> {
                         children: [
                           SizedBox(height: 8),
                           dashboardCard(
-                              "Орган контроля",
-                              'п. 1 ст. 20 Федерального закона от 22.11.1995 № 171-ФЗ "О государственном регулировании производства и оборота этилового спирта, алкогольной и спиртосодержащей продукции и об ограничении потребления (распития) алкогольной продукции": "Действие лицензии на производство и оборот этилового спирта, алкогольной и спиртосодержащей продукции приостанавливается решением лицензирующего органа на основании материалов, представленных органами, осуществляющими контроль и надзор за соблюдением настоящего Федерального закона, а также по инициативе самого лицензирующего органа в пределах его компетенции в следующих случаях: выявление нарушения, являющегося основанием для аннулирования лицензии".',
-                              'Розничная продажа алкогольной продукции без маркировки, либо с маркировкой поддельными марками запрещена.',
-                              'https://knd.mos.ru/requirements/public/8ff91444-9137-47d4-a463-92f400a33da9'),
+                            "Орган контроля",
+                            'Главное архивное управление города Москвы (Главархив) реализует государственную политику в сфере архивного дела, а также охраны и использования историко-документального наследия.',
+                            'ГЛАВНОЕ АРХИВНОЕ УПРАВЛЕНИЕ ГОРОДА МОСКВЫ',
+                            'https://knd.mos.ru/kno/details/bb1327a6-0a4f-40fa-a058-2a2f7c29980c?esc=%2Fkno',
+                          ),
                           SizedBox(height: 8),
                           dashboardCard(
-                              "Орган контроля",
-                              'п. 1 ст. 20 Федерального закона от 22.11.1995 № 171-ФЗ "О государственном регулировании производства и оборота этилового спирта, алкогольной и спиртосодержащей продукции и об ограничении потребления (распития) алкогольной продукции": "Действие лицензии на производство и оборот этилового спирта, алкогольной и спиртосодержащей продукции приостанавливается решением лицензирующего органа на основании материалов, представленных органами, осуществляющими контроль и надзор за соблюдением настоящего Федерального закона, а также по инициативе самого лицензирующего органа в пределах его компетенции в следующих случаях: выявление нарушения, являющегося основанием для аннулирования лицензии".',
-                              'Розничная продажа алкогольной продукции без маркировки, либо с маркировкой поддельными марками запрещена.',
-                              'https://knd.mos.ru/requirements/public/8ff91444-9137-47d4-a463-92f400a33da9'),
+                            "Орган контроля",
+                            'Государственная инспекция по контролю за использованием объектов недвижимости города Москвы (Госинспекция по недвижимости) осуществляет региональный государственный контроль за использованием объектов нежилого фонда на территории города Москвы и за ее пределами, находящихся в собственности города Москвы, в том числе являющихся объектами культурного наследия, мероприятия по определению вида фактического использования зданий (строений, сооружений) и нежилых помещений для целей налогообложения, контроль за соблюдением требований к размещению сезонных (летних) кафе при стационарных предприятиях общественного питания, муниципальный земельный контроль за использованием земель на территории города Москвы, выполняет полномочия собственника в части осуществления мероприятий по контролю за использованием земель, находящихся в собственности города Москвы и государственная собственность на которые не разграничена, и объектов нежилого фонда, а также организации их охраны в целях предотвращения и пресечения самовольного занятия и незаконного использования.',
+                            'ГОСУДАРСТВЕННАЯ ИНСПЕКЦИЯ ПО КОНТРОЛЮ ЗА ИСПОЛЬЗОВАНИЕМ ОБЪЕКТОВ НЕДВИЖИМОСТИ ГОРОДА МОСКВЫ',
+                            'https://knd.mos.ru/kno/details/b3310d09-5c67-4eaf-8eeb-4c011ad60f98?esc=%2Fkno',
+                          ),
+                          SizedBox(height: 8),
+                          dashboardCard(
+                            "Орган контроля",
+                            'Департамент здравоохранения города Москвы реализует государственную политику в сфере здравоохранения и создаёт необходимые условия для оказания медицинской помощи. Также занимается программами обеспечения лекарственными препаратами, предоставляет услуги по лицензированию в сфере здравоохранения.',
+                            'ДЕПАРТАМЕНТ ЗДРАВООХРАНЕНИЯ ГОРОДА МОСКВЫ',
+                            'https://knd.mos.ru/requirements/public/8ff91444-9137-47d4-a463-92f400a33da9',
+                          ),
                           SizedBox(height: 8),
                           SizedBox(
                             height: 48,
@@ -399,8 +400,7 @@ class _DashboardState extends State<Dashboard> {
                             child: CupertinoButton(
                               color: CupertinoColors.systemGrey5,
                               onPressed: () {
-                                launchUrl(Uri.parse(
-                                    'https://knd.mos.ru/requirements/public#anchor_20a69a9e-3d06-41ec-956b-0f9f710ecddf'));
+                                launchUrl(Uri.parse('https://knd.mos.ru/kno'));
                               },
                               child: const Text(
                                 "Все органы контроля",
@@ -451,13 +451,14 @@ class _DashboardState extends State<Dashboard> {
                             height: 48,
                             width: double.infinity,
                             child: CupertinoButton(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
                               color: CupertinoColors.systemGrey5,
                               onPressed: () {
                                 launchUrl(Uri.parse(
                                     'https://knd.mos.ru/requirements/public#anchor_20a69a9e-3d06-41ec-956b-0f9f710ecddf'));
                               },
                               child: const Text(
-                                "Все обязат. требования",
+                                "Все обязательные требования",
                                 style: TextStyle(color: Colors.black),
                               ),
                             ),

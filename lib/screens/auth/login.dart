@@ -34,6 +34,9 @@ class _LoginState extends State<Login> {
     try {
       final response = await apiClient.createSession(
         CreateSessionRequest(
+          sessionUser: isBusiness
+              ? CreateSessionRequest_SessionUser.SESSION_USER_BUSINESS
+              : CreateSessionRequest_SessionUser.SESSION_USER_AUTHORITY,
           email: email,
           password: password,
         ),
@@ -47,15 +50,20 @@ class _LoginState extends State<Login> {
         options: CallOptions(metadata: {'Authorization': 'Bearer $token'}),
       );
 
-      final user = User.fromBusinessUser(userResponse.business);
+      User user = isBusiness
+          ? User.fromBusinessUser(userResponse.business)
+          : User.fromAuthorityUser(userResponse.authority);
       user.email = email;
       user.password = password;
+      user.userType = isBusiness ? "Предприниматель" : "Инспектор";
+
       storageProvider.saveUser(user);
 
       setState(() {
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           CupertinoPageRoute(builder: (context) => MyApp()),
+          (r) => false,
         );
       });
     } on GrpcError catch (e) {
@@ -102,184 +110,189 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Stack(
-        children: [
-          Form(
-            autovalidateMode: AutovalidateMode.always,
-            key: loginFormKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              verticalDirection: VerticalDirection.down,
-              children: [
-                SizedBox(height: 16),
-                Text(
-                  "Вход в аккаунт",
-                  style: GoogleFonts.ptSerif(fontSize: 32),
-                ),
-                SizedBox(height: 8),
-                const Text(
-                  "Для входа в аккаунт выберите полномочие и авторизуйтесь",
-                  style: TextStyle(fontWeight: FontWeight.w300, fontSize: 16),
-                ),
-                Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+    return Scaffold(
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Stack(
+            children: [
+              Form(
+                autovalidateMode: AutovalidateMode.always,
+                key: loginFormKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  verticalDirection: VerticalDirection.down,
                   children: [
-                    CupertinoButton(
-                      color: isBusiness
-                          ? ColorResources.accentRed
-                          : CupertinoColors.secondarySystemFill,
-                      onPressed: () {
-                        setState(() {
-                          isBusiness = true;
-                        });
-                      },
-                      child: Text(
-                        "Бизнес",
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          color: isBusiness
-                              ? ColorResources.white
-                              : ColorResources.darkGrey,
-                        ),
-                      ),
+                    SizedBox(height: 16),
+                    Text(
+                      "Вход в аккаунт",
+                      style: GoogleFonts.ptSerif(fontSize: 32),
                     ),
-                    SizedBox(width: 12),
-                    CupertinoButton(
-                      padding: EdgeInsets.symmetric(horizontal: 48),
-                      color: isBusiness
-                          ? CupertinoColors.secondarySystemFill
-                          : ColorResources.accentRed,
-                      onPressed: () {
-                        setState(() {
-                          isBusiness = false;
-                        });
-                      },
-                      child: Text(
-                        "Инспектор",
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          color: isBusiness
-                              ? ColorResources.darkGrey
-                              : ColorResources.white,
-                        ),
-                      ),
+                    SizedBox(height: 8),
+                    const Text(
+                      "Для входа в аккаунт выберите полномочие и авторизуйтесь",
+                      style:
+                          TextStyle(fontWeight: FontWeight.w300, fontSize: 16),
                     ),
+                    Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CupertinoButton(
+                          color: isBusiness
+                              ? ColorResources.accentRed
+                              : CupertinoColors.secondarySystemFill,
+                          onPressed: () {
+                            setState(() {
+                              isBusiness = true;
+                            });
+                          },
+                          child: Text(
+                            "Бизнес",
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: isBusiness
+                                  ? ColorResources.white
+                                  : ColorResources.darkGrey,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        CupertinoButton(
+                          padding: EdgeInsets.symmetric(horizontal: 48),
+                          color: isBusiness
+                              ? CupertinoColors.secondarySystemFill
+                              : ColorResources.accentRed,
+                          onPressed: () {
+                            setState(() {
+                              isBusiness = false;
+                            });
+                          },
+                          child: Text(
+                            "Инспектор",
+                            style: GoogleFonts.inter(
+                              fontSize: 14,
+                              color: isBusiness
+                                  ? ColorResources.darkGrey
+                                  : ColorResources.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 32),
+                    textField("Адрес электронной почты", (value) {
+                      if (isBlank(value)) {
+                        return "Введите почту";
+                      }
+
+                      if (!EmailValidator.validate(value!)) {
+                        return "Невалидный формат электронной почты";
+                      }
+
+                      return null;
+                    }, (text) {
+                      email = text;
+                    }),
+                    SizedBox(height: 8),
+                    textField("Пароль", (value) {
+                      if (isBlank(value)) {
+                        return "Введите пароль";
+                      }
+
+                      return null;
+                    }, (text) {
+                      password = text;
+                    }, true),
+                    Spacer(),
+                    SizedBox(height: 96),
                   ],
                 ),
-                SizedBox(height: 32),
-                textField("Адрес электронной почты", (value) {
-                  if (isBlank(value)) {
-                    return "Введите почту";
-                  }
-
-                  if (!EmailValidator.validate(value!)) {
-                    return "Невалидный формат электронной почты";
-                  }
-
-                  return null;
-                }, (text) {
-                  email = text;
-                }),
-                SizedBox(height: 8),
-                textField("Пароль", (value) {
-                  if (isBlank(value)) {
-                    return "Введите пароль";
-                  }
-
-                  return null;
-                }, (text) {
-                  password = text;
-                }, true),
-                Spacer(),
-                SizedBox(height: 96),
-              ],
-            ),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              isBusiness
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Нет аккаунта?"),
-                        SizedBox(
-                          height: 24,
-                          child: TextButton(
-                            onPressed: () {
-                              setState(() {
-                                widget.onChangeFlow();
-                              });
-                            },
-                            child: Text("Создать"),
-                            style: ButtonStyle(
-                              padding:
-                                  MaterialStateProperty.all(EdgeInsets.all(4)),
-                              foregroundColor: MaterialStateProperty.all(
-                                  ColorResources.accentRed),
-                              overlayColor: MaterialStateProperty.all(
-                                ColorResources.accentRed.withOpacity(0.1),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    )
-                  : SizedBox(height: 0),
-              SizedBox(height: 8),
-              isBusiness
-                  ? Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text("Забыли пароль?"),
-                        SizedBox(
-                          height: 24,
-                          child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                CupertinoPageRoute(
-                                  builder: (context) => ResetPassword(),
-                                ),
-                              );
-                            },
-                            child: Text("Восстановить"),
-                            style: ButtonStyle(
-                              padding:
-                                  MaterialStateProperty.all(EdgeInsets.all(4)),
-                              foregroundColor: MaterialStateProperty.all(
-                                  ColorResources.accentRed),
-                              overlayColor: MaterialStateProperty.all(
-                                ColorResources.accentRed.withOpacity(0.1),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    )
-                  : SizedBox(height: 0),
-              SizedBox(height: 12),
-              Container(
-                height: 48,
-                width: double.infinity,
-                child: CupertinoButton(
-                  color: ColorResources.accentRed,
-                  onPressed: () async {
-                    if (loginFormKey.currentState!.validate()) {
-                      loginUser();
-                    }
-                  },
-                  child: Text("Войти"),
-                ),
               ),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  isBusiness
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Нет аккаунта?"),
+                            SizedBox(
+                              height: 24,
+                              child: TextButton(
+                                onPressed: () {
+                                  setState(() {
+                                    widget.onChangeFlow();
+                                  });
+                                },
+                                child: Text("Создать"),
+                                style: ButtonStyle(
+                                  padding: MaterialStateProperty.all(
+                                      EdgeInsets.all(4)),
+                                  foregroundColor: MaterialStateProperty.all(
+                                      ColorResources.accentRed),
+                                  overlayColor: MaterialStateProperty.all(
+                                    ColorResources.accentRed.withOpacity(0.1),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                      : SizedBox(height: 0),
+                  SizedBox(height: 8),
+                  isBusiness
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text("Забыли пароль?"),
+                            SizedBox(
+                              height: 24,
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    CupertinoPageRoute(
+                                      builder: (context) => ResetPassword(),
+                                    ),
+                                  );
+                                },
+                                child: Text("Восстановить"),
+                                style: ButtonStyle(
+                                  padding: MaterialStateProperty.all(
+                                      EdgeInsets.all(4)),
+                                  foregroundColor: MaterialStateProperty.all(
+                                      ColorResources.accentRed),
+                                  overlayColor: MaterialStateProperty.all(
+                                    ColorResources.accentRed.withOpacity(0.1),
+                                  ),
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                      : SizedBox(height: 0),
+                  SizedBox(height: 12),
+                  Container(
+                    height: 48,
+                    width: double.infinity,
+                    child: CupertinoButton(
+                      color: ColorResources.accentRed,
+                      onPressed: () async {
+                        if (loginFormKey.currentState!.validate()) {
+                          loginUser();
+                        }
+                      },
+                      child: Text("Войти"),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 16),
             ],
           ),
-          SizedBox(height: 16),
-        ],
+        ),
       ),
     );
   }

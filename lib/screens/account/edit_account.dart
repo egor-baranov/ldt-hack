@@ -14,8 +14,8 @@ import '../../models/User.dart';
 import '../../providers/LocalStorageProvider.dart';
 
 class EditAccount extends StatefulWidget {
-
   const EditAccount({super.key, required this.initialUser});
+
   final User initialUser;
 
   @override
@@ -225,45 +225,45 @@ class _EditAccountState extends State<EditAccount> {
                         false,
                         PhoneInputFormatter(),
                       ),
-                      SizedBox(height: 8),
-                      textField(
-                        "Адрес электронной почты",
-                        user.email,
-                        (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Адрес электронной почты не должен быть пустым";
-                          }
-
-                          if (!EmailValidator.validate(value)) {
-                            return "Неверный формат электронной почты";
-                          }
-
-                          return null;
-                        },
-                        (text) {
-                          user.email = text;
-                        },
-                      ),
-                      SizedBox(height: 8),
-                      textField(
-                        "Пароль",
-                        user.password,
-                        (value) {
-                          if (value == null || value.isEmpty) {
-                            return "Пароль не должен быть пустым";
-                          }
-
-                          if (value.length < 6) {
-                            return "Пароль должен быть не менее 6 символов в длину";
-                          }
-
-                          return null;
-                        },
-                        (text) {
-                          user.password = text;
-                        },
-                        true,
-                      ),
+                      // SizedBox(height: 8),
+                      // textField(
+                      //   "Адрес электронной почты",
+                      //   user.email,
+                      //   (value) {
+                      //     if (value == null || value.isEmpty) {
+                      //       return "Адрес электронной почты не должен быть пустым";
+                      //     }
+                      //
+                      //     if (!EmailValidator.validate(value)) {
+                      //       return "Неверный формат электронной почты";
+                      //     }
+                      //
+                      //     return null;
+                      //   },
+                      //   (text) {
+                      //     user.email = text;
+                      //   },
+                      // ),
+                      // SizedBox(height: 8),
+                      // textField(
+                      //   "Пароль",
+                      //   user.password,
+                      //   (value) {
+                      //     if (value == null || value.isEmpty) {
+                      //       return "Пароль не должен быть пустым";
+                      //     }
+                      //
+                      //     if (value.length < 6) {
+                      //       return "Пароль должен быть не менее 6 символов в длину";
+                      //     }
+                      //
+                      //     return null;
+                      //   },
+                      //   (text) {
+                      //     user.password = text;
+                      //   },
+                      //   true,
+                      // ),
                       SizedBox(height: 32),
                       Text(
                         "Основные данные",
@@ -315,27 +315,17 @@ class _EditAccountState extends State<EditAccount> {
                         },
                       ),
                       SizedBox(height: 8),
-                      textField(
-                        "ИНН",
-                        user.inn,
-                        (value) {
-                          return null;
-                        },
-                        (text) {
-                          user.inn = text;
-                        },
-                      ),
+                      textField("ИНН", user.inn, (value) {
+                        return null;
+                      }, (text) {
+                        user.inn = text;
+                      }, false, MaskedInputFormatter("0000000000")),
                       SizedBox(height: 8),
-                      textField(
-                        "СНИЛС",
-                        user.snils,
-                        (value) {
-                          return null;
-                        },
-                        (text) {
-                          user.snils = text;
-                        },
-                      ),
+                      textField("СНИЛС", user.snils, (value) {
+                        return null;
+                      }, (text) {
+                        user.snils = text;
+                      }, false, MaskedInputFormatter("000-000-000-00")),
                       SizedBox(height: 8),
                       genderSelection(),
                       SizedBox(height: 8),
@@ -352,6 +342,8 @@ class _EditAccountState extends State<EditAccount> {
                         (text) {
                           user.birthDate = text;
                         },
+                        false,
+                        MaskedInputFormatter("00.00.0000"),
                       ),
                       SizedBox(height: 8),
                       textField(
@@ -370,29 +362,19 @@ class _EditAccountState extends State<EditAccount> {
                         style: GoogleFonts.ptSerif(fontSize: 24),
                       ),
                       SizedBox(height: 8),
-                      textField(
-                        "Серия",
-                        user.passport?.series,
-                        (value) {
-                          return null;
-                        },
-                        (text) {
-                          user.passport ??= Passport();
-                          user.passport!.series = text;
-                        },
-                      ),
+                      textField("Серия", user.passport?.series, (value) {
+                        return null;
+                      }, (text) {
+                        user.passport ??= Passport();
+                        user.passport!.series = text;
+                      }, false, MaskedInputFormatter("0000")),
                       SizedBox(height: 8),
-                      textField(
-                        "Номер",
-                        user.passport?.number,
-                        (value) {
-                          return null;
-                        },
-                        (text) {
-                          user.passport ??= Passport();
-                          user.passport!.number = text;
-                        },
-                      ),
+                      textField("Номер", user.passport?.number, (value) {
+                        return null;
+                      }, (text) {
+                        user.passport ??= Passport();
+                        user.passport!.number = text;
+                      }, false, MaskedInputFormatter("000000")),
                       SizedBox(height: 8),
                       textField(
                         "Дата выдачи",
@@ -404,6 +386,8 @@ class _EditAccountState extends State<EditAccount> {
                           user.passport ??= Passport();
                           user.passport!.date = text;
                         },
+                        false,
+                        MaskedInputFormatter("00.00.0000"),
                       ),
                       SizedBox(height: 8),
                       textField(

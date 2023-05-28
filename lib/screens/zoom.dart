@@ -1,14 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lodt_hack/clients/ApiClient.dart';
 import 'package:lodt_hack/models/consultation/Consultation.dart';
 import 'package:lodt_hack/models/consultation/ConsultationHolder.dart';
 import 'package:lodt_hack/providers/LocalStorageProvider.dart';
 import 'package:lodt_hack/screens/create_consultation.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../generated/google/protobuf/empty.pb.dart';
+import '../models/User.dart';
 import '../styles/ColorResources.dart';
 import '../utils/parser.dart';
 import 'consultation.dart';
+import 'package:grpc/grpc.dart';
 
 class Zoom extends StatefulWidget {
   const Zoom({super.key});
@@ -19,6 +23,8 @@ class Zoom extends StatefulWidget {
 
 class _ZoomState extends State<Zoom> {
   ConsultationHolder consultations = ConsultationHolder([]);
+  User user = User();
+  String? token;
 
   void fetchData() {
     storageProvider.getConsultations().then(
@@ -29,12 +35,45 @@ class _ZoomState extends State<Zoom> {
             },
           ),
         );
+    storageProvider.getUser().then(
+          (value) => setState(
+            () {
+              user = value!;
+            },
+          ),
+        );
+    storageProvider.getToken().then(
+          (value) => setState(
+            () {
+              token = value!;
+            },
+          ),
+        );
   }
 
   @override
   void initState() {
     super.initState();
     fetchData();
+  }
+
+  Future<List<ConsultationModel>> fetchConsultations() async {
+    final response = await apiClient.listConsultationTopics(
+      Empty(),
+      options: CallOptions(
+        metadata: {'Authorization': 'Bearer ${token!}'},
+      ),
+    );
+
+    return response.authorityTopics
+        .map(
+          (e) =>
+              ConsultationModel(
+                  id: e.authorityId.toString(),
+                  title: e.authorityName,
+              ),
+        )
+        .toList();
   }
 
   List<ConsultationModel> sorted(List<ConsultationModel> c) {
@@ -145,33 +184,36 @@ class _ZoomState extends State<Zoom> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 verticalDirection: VerticalDirection.down,
                 children: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        CupertinoPageRoute(
-                          builder: (context) => CreateConsultation(),
+                  if (user.isBusiness())
+                    TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          CupertinoPageRoute(
+                            builder: (context) => CreateConsultation(),
+                          ),
+                        );
+                        fetchData();
+                      },
+                      child: Text("Записаться на консультацию"),
+                      style: ButtonStyle(
+                        foregroundColor:
+                            MaterialStateProperty.all(ColorResources.accentRed),
+                        overlayColor: MaterialStateProperty.all(
+                          ColorResources.accentRed.withOpacity(0.1),
                         ),
-                      );
-                      fetchData();
-                    },
-                    child: Text("Записаться на консультацию"),
-                    style: ButtonStyle(
-                      foregroundColor:
-                          MaterialStateProperty.all(ColorResources.accentRed),
-                      overlayColor: MaterialStateProperty.all(
-                        ColorResources.accentRed.withOpacity(0.1),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 16),
+                  if (user.isBusiness()) SizedBox(height: 16),
                   if (consultations.consultations.isEmpty)
                     Expanded(
                       child: Center(
                         child: ConstrainedBox(
                           constraints: BoxConstraints(maxHeight: 300),
                           child: Text(
-                            "Вы пока не записались ни на одну консультацию",
+                            user.isBusiness()
+                                ? "Вы пока не записались ни на одну консультацию"
+                                : "В данный момент вы не записаны в качестве инспектора на какую-либо консультацию",
                             softWrap: true,
                             maxLines: 3,
                             style: GoogleFonts.ptSerif(fontSize: 18),

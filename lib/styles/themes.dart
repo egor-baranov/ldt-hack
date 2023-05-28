@@ -22,6 +22,8 @@ MaterialColor black = const MaterialColor(
 );
 
 final light = ThemeData(
+  splashColor: Colors.transparent,
+  highlightColor: Colors.transparent,
   primaryColorDark: ColorResources.accentRed,
   primarySwatch: black,
   appBarTheme: const AppBarTheme(

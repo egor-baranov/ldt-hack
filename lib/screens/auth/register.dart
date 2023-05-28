@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lodt_hack/clients/ApiClient.dart';
 import 'package:lodt_hack/generated/app.pb.dart';
+import 'package:lodt_hack/generated/google/protobuf/timestamp.pb.dart';
 import 'package:lodt_hack/main.dart';
 import 'package:lodt_hack/providers/LocalStorageProvider.dart';
 import 'package:lodt_hack/styles/ColorResources.dart';
@@ -53,11 +54,12 @@ class _RegisterState extends State<Register> {
       storageProvider.saveUser(user);
 
       setState(() {
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           CupertinoPageRoute(
             builder: (context) => MyApp(),
           ),
+          (r) => false,
         );
       });
     } on GrpcError catch (e) {
@@ -221,7 +223,7 @@ class _RegisterState extends State<Register> {
                       return null;
                     }, (text) {
                       user.email = text;
-                    }),
+                    }, false, MaskedInputFormatter("00.00.0000")),
                     SizedBox(height: 8),
                     textField("Пароль", (value) {
                       if (isBlank(value)) {

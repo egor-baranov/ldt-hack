@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/styles/ColorResources.dart';
@@ -43,6 +45,39 @@ class _ConsultationState extends State<Consultation> {
           ),
         ),
       ),
+    );
+  }
+
+  void cancelConsultation() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text("Вы уверены, что хотите отменить консультацию?"),
+          content: const Text("Операцию невозможно будет отменить"),
+          actions: [
+            TextButton(
+              child:
+                  const Text("Продолжить", style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                Timer(
+                  const Duration(milliseconds: 200),
+                  () {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            ),
+            TextButton(
+              child: const Text("Отмена"),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      },
     );
   }
 
@@ -124,7 +159,7 @@ class _ConsultationState extends State<Consultation> {
                     child: CupertinoButton(
                       color: ColorResources.accentPink,
                       onPressed: () {
-                        Navigator.pop(context);
+                        cancelConsultation();
                       },
                       child: const Text(
                         "Отменить консультацию",

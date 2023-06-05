@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/clients/ApiClient.dart';
@@ -22,9 +25,10 @@ class Zoom extends StatefulWidget {
 }
 
 class _ZoomState extends State<Zoom> {
-  ConsultationHolder consultations = ConsultationHolder([]);
+  List<ConsultationModel> consultations = [];
   User user = User();
   String? token;
+  Timer? timer;
 
   void fetchData() {
     storageProvider.getUser().then(
@@ -42,15 +46,25 @@ class _ZoomState extends State<Zoom> {
             },
           ),
         );
+
+    fetchConsultations();
   }
 
   @override
   void initState() {
     super.initState();
     fetchData();
+
+    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => fetchConsultations());
   }
 
   Future<void> fetchConsultations() async {
+    if (token == null || !mounted) {
+      return;
+    }
+
+    print("Fetching consultations..." + Random(100).nextInt(100).toString());
+
     try {
       final response = await apiClient.listConsultationAppointments(
         Empty(),
@@ -60,7 +74,7 @@ class _ZoomState extends State<Zoom> {
       );
 
       setState(() {
-        consultations.consultations = response.appointmentInfo
+        consultations = response.appointmentInfo
             .map(
               (e) => ConsultationModel(
                 id: e.id,
@@ -116,7 +130,9 @@ class _ZoomState extends State<Zoom> {
               ),
             ),
           ),
-          fetchData()
+          setState(() {
+            fetchData();
+          })
         },
         child: Container(
           width: double.infinity,
@@ -211,7 +227,15 @@ class _ZoomState extends State<Zoom> {
                             builder: (context) => CreateConsultation(),
                           ),
                         );
-                        fetchData();
+
+                        setState(
+                          () {
+                            Future.delayed(const Duration(seconds: 3),
+                                () {
+                              fetchConsultations();
+                            });
+                          },
+                        );
                       },
                       child: Text("Записаться на консультацию"),
                       style: ButtonStyle(
@@ -223,7 +247,7 @@ class _ZoomState extends State<Zoom> {
                       ),
                     ),
                   if (user.isBusiness()) SizedBox(height: 16),
-                  if (consultations.consultations.isEmpty)
+                  if (consultations.isEmpty)
                     Expanded(
                       child: Center(
                         child: ConstrainedBox(
@@ -240,7 +264,7 @@ class _ZoomState extends State<Zoom> {
                         ),
                       ),
                     ),
-                  ...sorted(consultations.consultations).map(
+                  ...sorted(consultations).map(
                     (e) => Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

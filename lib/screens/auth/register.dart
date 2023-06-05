@@ -284,7 +284,7 @@ class _RegisterState extends State<Register> {
                       return null;
                     }, (text) {
                       user.birthDate = text;
-                    }),
+                    }, false, MaskedInputFormatter("00.00.0000")),
                     SizedBox(height: 32),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,

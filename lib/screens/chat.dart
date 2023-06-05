@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/clients/ApiClient.dart';
 import 'package:lodt_hack/providers/LocalStorageProvider.dart';
+import 'package:lodt_hack/widgets/ChatCard.dart';
 
 import '../generated/app.pb.dart';
 import '../models/chat/Chat.dart';
@@ -10,6 +11,9 @@ import '../styles/ColorResources.dart';
 import '../utils/parser.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:grpc/grpc.dart';
+
+import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 
 import 'info.dart';
 
@@ -27,34 +31,81 @@ class _ChatState extends State<Chat> {
   ChatHolder chat = ChatHolder([]);
   String? token;
 
+  final SpeechToText _speechToText = SpeechToText();
+  bool _speechEnabled = false;
+  String _lastWords = '';
+
+  /// This has to happen only once per app
+  void _initSpeech() async {
+    print("speech init");
+    await _speechToText.initialize();
+    _stopListening();
+    setState(() {});
+  }
+
+  /// Each time to start a speech recognition session
+  void _startListening() async {
+    print("speech start");
+    await _speechToText.listen(onResult: _onSpeechResult, localeId: "ru-RU");
+    setState(() {
+      _speechEnabled = true;
+    });
+  }
+
+  /// Manually stop the active speech recognition session
+  /// Note that there are also timeouts that each platform enforces
+  /// and the SpeechToText plugin supports setting timeouts on the
+  /// listen method.
+  void _stopListening() async {
+    print("speech stop");
+    await _speechToText.stop();
+    setState(() {
+      _speechEnabled = false;
+    });
+  }
+
+  /// This is the callback that the SpeechToText plugin calls when
+  /// the platform returns recognized words.
+  void _onSpeechResult(SpeechRecognitionResult result) {
+    setState(() {
+
+      _inputController.text = result.recognizedWords;
+      print("speech result: " + _lastWords);
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+
     storageProvider.getChat().then(
-          (value) => setState(
-            () {
+          (value) =>
+          setState(
+                () {
               chat = value;
               print(chat.toJson());
               Future.delayed(
-                Duration(milliseconds: 50),
-                () {
+                const Duration(milliseconds: 50),
+                    () {
                   _controller.animateTo(
                     _controller.position.maxScrollExtent,
-                    duration: Duration(milliseconds: 600),
+                    duration: const Duration(milliseconds: 600),
                     curve: Curves.ease,
                   );
                 },
               );
             },
           ),
-        );
+    );
     storageProvider.getToken().then(
-          (value) => setState(
-            () {
+          (value) =>
+          setState(
+                () {
               token = value!;
             },
           ),
-        );
+    );
+    _initSpeech();
   }
 
   void _scrollDown([int delay = 100]) {
@@ -126,63 +177,103 @@ class _ChatState extends State<Chat> {
       children: [
         Row(
           mainAxisAlignment:
-              my ? MainAxisAlignment.end : MainAxisAlignment.start,
+          my ? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
-            ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 340),
-              child: Card(
-                color: my
-                    ? ColorResources.accentRed
-                    : CupertinoColors.lightBackgroundGray,
-                shadowColor: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16)),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        text,
-                        softWrap: true,
-                        style: TextStyle(
-                            color: (my ? Colors.white : Colors.black)),
-                        maxLines: 10,
+            Stack(
+              children: [
+                Column(
+                  children: [
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 340),
+                      child: Card(
+                        color: my
+                            ? ColorResources.accentRed
+                            : CupertinoColors.lightBackgroundGray,
+                        shadowColor: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                text,
+                                softWrap: true,
+                                style: TextStyle(
+                                    color: (my ? Colors.white : Colors.black)),
+                                maxLines: 10,
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
+                    ),
+                    if (!my) const SizedBox(height: 20),
+                  ],
                 ),
-              ),
+                if (!my)
+                  Positioned(
+                    bottom: -4,
+                    left: 8,
+                    child: Card(
+                      color: CupertinoColors.systemGrey3,
+                      shadowColor: Colors.transparent,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                      child: const Padding(
+                        padding: EdgeInsets.only(
+                            left: 8.0, right: 8, top: 8, bottom: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.thumb_up_rounded,
+                              color: CupertinoColors.systemGrey,
+                              size: 20,
+                            ),
+                            SizedBox(width: 12),
+                            Icon(
+                              Icons.thumb_down_rounded,
+                              size: 20,
+                              color: CupertinoColors.systemGrey,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
           ],
         ),
-        ...results.map(
-          (e) => Padding(
-            padding: const EdgeInsets.only(top: 4.0, left: 8),
-            child: Material(
-              color: ColorResources.accentRed,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-              child: Container(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        e,
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ),
-        (my || results.isEmpty) ? SizedBox() : rateCard(),
-        const SizedBox(height: 8),
+        // ...results.map(
+        //   (e) => Padding(
+        //     padding: const EdgeInsets.only(top: 4.0, left: 8),
+        //     child: Material(
+        //       color: ColorResources.accentRed,
+        //       shape: RoundedRectangleBorder(
+        //           borderRadius: BorderRadius.circular(16)),
+        //       child: Container(
+        //         child: Padding(
+        //           padding:
+        //               const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        //           child: Column(
+        //             crossAxisAlignment: CrossAxisAlignment.start,
+        //             children: [
+        //               Text(
+        //                 e,
+        //                 style: TextStyle(color: Colors.white),
+        //               ),
+        //             ],
+        //           ),
+        //         ),
+        //       ),
+        //     ),
+        //   ),
+        // ),
+        // (my || results.isEmpty) ? SizedBox() : rateCard(),
+        // const SizedBox(height: 8),
       ],
     );
   }
@@ -196,11 +287,15 @@ class _ChatState extends State<Chat> {
         child: Row(
           children: [
             IconButton(
-              icon: const Icon(
-                Icons.keyboard_voice_outlined,
-                color: ColorResources.darkGrey,
+              icon: Icon(
+                _speechEnabled ? Icons.mic : Icons.mic_off,
+                color: _speechEnabled
+                    ? ColorResources.red
+                    : ColorResources.darkGrey,
               ),
-              onPressed: () {},
+              onPressed: _speechToText.isNotListening
+                  ? _startListening
+                  : _stopListening,
             ),
             Expanded(
               child: TextField(
@@ -219,7 +314,7 @@ class _ChatState extends State<Chat> {
                   filled: true,
                   border: OutlineInputBorder(
                     borderSide:
-                        const BorderSide(width: 0, style: BorderStyle.none),
+                    const BorderSide(width: 0, style: BorderStyle.none),
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
@@ -230,6 +325,7 @@ class _ChatState extends State<Chat> {
                   color: ColorResources.darkGrey),
               onPressed: () {
                 if (!isBlank(_inputController.text)) {
+                  _stopListening();
                   sendMessage(_inputController.text, true, []);
                   _inputController.clear();
                 }
@@ -245,28 +341,37 @@ class _ChatState extends State<Chat> {
     try {
       await apiClient
           .sendChatBotMessage(
-            SendChatBotMessageRequest(message: text),
-            options: CallOptions(
-              metadata: {'Authorization': 'Bearer $token'},
-            ),
-          )
+        SendChatBotMessageRequest(message: text),
+        options: CallOptions(
+          metadata: {'Authorization': 'Bearer $token'},
+        ),
+      )
           .then(
-            (p0) => {
-              p0.messages
-                  .map((e) => Message(text: e, sentByUser: false, results: []))
-                  .forEach(
+            (p0) =>
+        {
+          p0.messages
+              .map(
+                (e) =>
+                Message(
+                    text: e,
+                    sentByUser: false,
+                    results: [],
+                    reaction: MessageReaction.none,
+                    originMessageText: text),
+          )
+              .forEach(
                 (element) {
-                  chat.messages.add(element);
-                },
-              ),
-              setState(
-                () {
-                  storageProvider.saveChat(chat);
-                  _scrollDown();
-                },
-              )
+              chat.messages.add(element);
             },
-          );
+          ),
+          setState(
+                () {
+              storageProvider.saveChat(chat);
+              _scrollDown();
+            },
+          )
+        },
+      );
     } on GrpcError catch (e) {
       showDialog(
         context: context,
@@ -289,16 +394,18 @@ class _ChatState extends State<Chat> {
   }
 
   void sendMessage(String text, bool byUser, List<String> results) {
+
     if (isBlank(text)) {
       return;
     }
 
     setState(() {
       final message = Message(
-        text: text,
-        sentByUser: byUser,
-        results: results,
-      );
+          text: text,
+          sentByUser: byUser,
+          results: results,
+          reaction: MessageReaction.none,
+          originMessageText: "");
 
       chat.messages.add(message);
       storageProvider.saveChat(chat);
@@ -333,12 +440,13 @@ class _ChatState extends State<Chat> {
                       Navigator.push(
                         context,
                         CupertinoPageRoute(
-                          builder: (context) => const Info(
+                          builder: (context) =>
+                          const Info(
                             title: "Поиск по чату",
                             subtitle:
-                                "Производите поиск по сообщениям в диалоге с чат-ботом",
+                            "Производите поиск по сообщениям в диалоге с чат-ботом",
                             description:
-                                "В данный момент функция находится в стадии разработки",
+                            "В данный момент функция находится в стадии разработки",
                             externalLink: "https://google.com",
                             buttonLabel: "Найти",
                           ),
@@ -390,7 +498,22 @@ class _ChatState extends State<Chat> {
                         ),
                       ),
                     ...chat.messages.map(
-                      (e) => chatCard(e.text, e.sentByUser, e.results),
+                          (e) =>
+                          ChatCard(
+                            token: token!,
+                            message: e,
+                            onUpdate: (message) {
+                              setState(
+                                    () {
+                                  chat.messages[chat.messages.indexWhere(
+                                          (element) =>
+                                      element.text == message.text)] = message;
+                                  storageProvider.saveChat(chat);
+                                  print(chat);
+                                },
+                              );
+                            },
+                          ),
                     )
                   ],
                 ),

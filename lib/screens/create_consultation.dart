@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ffi';
 
 import 'package:flutter/cupertino.dart';
@@ -109,11 +110,11 @@ class _CreateConsultationState extends State<CreateConsultation> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Ошибка получения данных"),
+            title: const Text("Ошибка получения данных"),
             content: Text(e.message ?? "Текст ошибки отсутствует"),
             actions: [
               TextButton(
-                child: Text("Продолжить"),
+                child: const Text("Продолжить"),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -146,18 +147,21 @@ class _CreateConsultationState extends State<CreateConsultation> {
         availableSlotNames = availableSlots
             .map((e) => formatInterval(e.fromTime, e.toTime))
             .toList();
-        selectedSlotName = availableSlotNames.first;
+
+        if (!availableSlotNames.contains(selectedSlotName)) {
+          selectedSlotName = availableSlotNames.first;
+        }
       });
     } on GrpcError catch (e) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Ошибка получения данных"),
+            title: const Text("Ошибка получения данных"),
             content: Text(e.message ?? "Текст ошибки отсутствует"),
             actions: [
               TextButton(
-                child: Text("Продолжить"),
+                child: const Text("Продолжить"),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -193,11 +197,11 @@ class _CreateConsultationState extends State<CreateConsultation> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Ошибка получения данных"),
+            title: const Text("Ошибка получения данных"),
             content: Text(e.message ?? "Текст ошибки отсутствует"),
             actions: [
               TextButton(
-                child: Text("Продолжить"),
+                child: const Text("Продолжить"),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -239,11 +243,11 @@ class _CreateConsultationState extends State<CreateConsultation> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text("Ошибка получения данных"),
+            title: const Text("Ошибка получения данных"),
             content: Text(e.message ?? "Текст ошибки отсутствует"),
             actions: [
               TextButton(
-                child: Text("Продолжить"),
+                child: const Text("Продолжить"),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -278,7 +282,7 @@ class _CreateConsultationState extends State<CreateConsultation> {
   Widget authorityDropdownList() {
     return DropdownButton2(
       isExpanded: true,
-      hint: Text('Контрольно-надзорный орган'),
+      hint: const Text('Контрольно-надзорный орган'),
       items: authorityNames
           .map(
             (e) => DropdownMenuItem(
@@ -330,7 +334,7 @@ class _CreateConsultationState extends State<CreateConsultation> {
   Widget consultationDropdownList() {
     return DropdownButton2(
       isExpanded: true,
-      hint: Text('Тема консультации КНО'),
+      hint: const Text('Тема консультации КНО'),
       items: consultationNames
           .map(
             (e) => DropdownMenuItem(
@@ -369,7 +373,7 @@ class _CreateConsultationState extends State<CreateConsultation> {
   Widget datesDropdownList() {
     return DropdownButton2(
       isExpanded: true,
-      hint: Text('Даты записи'),
+      hint: const Text('Даты записи'),
       items: dateNames
           .map(
             (e) => DropdownMenuItem(
@@ -385,6 +389,8 @@ class _CreateConsultationState extends State<CreateConsultation> {
       onChanged: (v) {
         setState(() {
           selectedDateName = v as String;
+          getAvailableSlots();
+          print(selectedDateName);
         });
       },
       value: selectedDateName,
@@ -408,7 +414,7 @@ class _CreateConsultationState extends State<CreateConsultation> {
   Widget slotsDropdownList() {
     return DropdownButton2(
       isExpanded: true,
-      hint: Text('Временные интервалы записи'),
+      hint: const Text('Временные интервалы записи'),
       items: availableSlotNames
           .map(
             (e) => DropdownMenuItem(
@@ -444,6 +450,41 @@ class _CreateConsultationState extends State<CreateConsultation> {
     );
   }
 
+  void cancelConsultationCreation() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+              "Вы уверены, что хотите отменить создание консультации?"),
+          content: const Text("В этом случае ее данные будут утеряны"),
+          actions: [
+            TextButton(
+              child:
+                  const Text("Продолжить", style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                Timer(
+                  const Duration(milliseconds: 200),
+                  () {
+                    Navigator.pop(context);
+                    Navigator.pop(context);
+                  },
+                );
+              },
+            ),
+            TextButton(
+              child: const Text("Отмена"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -468,21 +509,21 @@ class _CreateConsultationState extends State<CreateConsultation> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       verticalDirection: VerticalDirection.down,
                       children: [
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                         const Text(
                           "Запишитесь на консультацию с инспектором в удобное время, а перед ее началом вам придет уведомление",
                           style: TextStyle(
                               fontWeight: FontWeight.w300, fontSize: 16),
                         ),
-                        SizedBox(height: 32),
+                        const SizedBox(height: 32),
                         authorityDropdownList(),
-                        SizedBox(height: 32),
+                        const SizedBox(height: 32),
                         consultationDropdownList(),
-                        SizedBox(height: 32),
+                        const SizedBox(height: 32),
                         datesDropdownList(),
-                        SizedBox(height: 32),
+                        const SizedBox(height: 32),
                         slotsDropdownList(),
-                        SizedBox(height: 32),
+                        const SizedBox(height: 32),
                         Container(
                           height: 48,
                           width: double.infinity,
@@ -510,14 +551,14 @@ class _CreateConsultationState extends State<CreateConsultation> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         Container(
                           height: 48,
                           width: double.infinity,
                           child: CupertinoButton(
                             color: ColorResources.accentPink,
                             onPressed: () {
-                              Navigator.pop(context);
+                              cancelConsultationCreation();
                             },
                             child: const Text(
                               "Отменить создание записи",
@@ -527,7 +568,7 @@ class _CreateConsultationState extends State<CreateConsultation> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 16),
+                        const SizedBox(height: 16),
                       ],
                     ),
                   ),

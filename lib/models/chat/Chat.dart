@@ -18,7 +18,7 @@ class ChatHolder {
 
   Map<String, dynamic> toJson() {
     return {
-      'messages': jsonEncode(messages),
+      'messages': jsonEncode(messages.map((e) => e.toJson()).toList()),
     };
   }
 }

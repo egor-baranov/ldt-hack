@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/clients/ApiClient.dart';
 import 'package:lodt_hack/providers/LocalStorageProvider.dart';
+import 'package:lodt_hack/utils/widgets.dart';
 import 'package:lodt_hack/widgets/ChatCard.dart';
 
 import '../generated/app.pb.dart';
@@ -68,7 +69,6 @@ class _ChatState extends State<Chat> {
   /// the platform returns recognized words.
   void _onSpeechResult(SpeechRecognitionResult result) {
     setState(() {
-
       _inputController.text = result.recognizedWords;
       print("speech result: " + _lastWords);
     });
@@ -79,14 +79,13 @@ class _ChatState extends State<Chat> {
     super.initState();
 
     storageProvider.getChat().then(
-          (value) =>
-          setState(
-                () {
+          (value) => setState(
+            () {
               chat = value;
               print(chat.toJson());
               Future.delayed(
                 const Duration(milliseconds: 50),
-                    () {
+                () {
                   _controller.animateTo(
                     _controller.position.maxScrollExtent,
                     duration: const Duration(milliseconds: 600),
@@ -96,15 +95,14 @@ class _ChatState extends State<Chat> {
               );
             },
           ),
-    );
+        );
     storageProvider.getToken().then(
-          (value) =>
-          setState(
-                () {
+          (value) => setState(
+            () {
               token = value!;
             },
           ),
-    );
+        );
     _initSpeech();
   }
 
@@ -177,7 +175,7 @@ class _ChatState extends State<Chat> {
       children: [
         Row(
           mainAxisAlignment:
-          my ? MainAxisAlignment.end : MainAxisAlignment.start,
+              my ? MainAxisAlignment.end : MainAxisAlignment.start,
           children: [
             Stack(
               children: [
@@ -314,7 +312,7 @@ class _ChatState extends State<Chat> {
                   filled: true,
                   border: OutlineInputBorder(
                     borderSide:
-                    const BorderSide(width: 0, style: BorderStyle.none),
+                        const BorderSide(width: 0, style: BorderStyle.none),
                     borderRadius: BorderRadius.circular(10.0),
                   ),
                 ),
@@ -341,37 +339,35 @@ class _ChatState extends State<Chat> {
     try {
       await apiClient
           .sendChatBotMessage(
-        SendChatBotMessageRequest(message: text),
-        options: CallOptions(
-          metadata: {'Authorization': 'Bearer $token'},
-        ),
-      )
+            SendChatBotMessageRequest(message: text),
+            options: CallOptions(
+              metadata: {'Authorization': 'Bearer $token'},
+            ),
+          )
           .then(
-            (p0) =>
-        {
-          p0.messages
-              .map(
-                (e) =>
-                Message(
+            (p0) => {
+              p0.messages
+                  .map(
+                (e) => Message(
                     text: e,
                     sentByUser: false,
                     results: [],
                     reaction: MessageReaction.none,
                     originMessageText: text),
-          )
-              .forEach(
+              )
+                  .forEach(
                 (element) {
-              chat.messages.add(element);
-            },
-          ),
-          setState(
+                  chat.messages.add(element);
+                },
+              ),
+              setState(
                 () {
-              storageProvider.saveChat(chat);
-              _scrollDown();
+                  storageProvider.saveChat(chat);
+                  _scrollDown();
+                },
+              )
             },
-          )
-        },
-      );
+          );
     } on GrpcError catch (e) {
       showDialog(
         context: context,
@@ -394,7 +390,6 @@ class _ChatState extends State<Chat> {
   }
 
   void sendMessage(String text, bool byUser, List<String> results) {
-
     if (isBlank(text)) {
       return;
     }
@@ -440,15 +435,14 @@ class _ChatState extends State<Chat> {
                       Navigator.push(
                         context,
                         CupertinoPageRoute(
-                          builder: (context) =>
-                          const Info(
+                          builder: (context) => Info(
                             title: "Поиск по чату",
                             subtitle:
-                            "Производите поиск по сообщениям в диалоге с чат-ботом",
-                            description:
-                            "В данный момент функция находится в стадии разработки",
+                                "Производите поиск по сообщениям в диалоге с чат-ботом",
+                            description: "",
                             externalLink: "https://google.com",
                             buttonLabel: "Найти",
+                            customBody: searchBox(),
                           ),
                         ),
                       );
@@ -498,22 +492,21 @@ class _ChatState extends State<Chat> {
                         ),
                       ),
                     ...chat.messages.map(
-                          (e) =>
-                          ChatCard(
-                            token: token!,
-                            message: e,
-                            onUpdate: (message) {
-                              setState(
-                                    () {
-                                  chat.messages[chat.messages.indexWhere(
-                                          (element) =>
+                      (e) => ChatCard(
+                        token: token!,
+                        message: e,
+                        onUpdate: (message) {
+                          setState(
+                            () {
+                              chat.messages[chat.messages.indexWhere(
+                                  (element) =>
                                       element.text == message.text)] = message;
-                                  storageProvider.saveChat(chat);
-                                  print(chat);
-                                },
-                              );
+                              storageProvider.saveChat(chat);
+                              print(chat);
                             },
-                          ),
+                          );
+                        },
+                      ),
                     )
                   ],
                 ),

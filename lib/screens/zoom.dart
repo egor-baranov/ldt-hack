@@ -9,6 +9,10 @@ import 'package:lodt_hack/models/consultation/ConsultationHolder.dart';
 import 'package:lodt_hack/providers/LocalStorageProvider.dart';
 import 'package:lodt_hack/screens/create_consultation.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:lodt_hack/utils/calendar.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import '../generated/google/protobuf/empty.pb.dart';
 import '../models/User.dart';
@@ -55,7 +59,8 @@ class _ZoomState extends State<Zoom> {
     super.initState();
     fetchData();
 
-    timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => fetchConsultations());
+    timer = Timer.periodic(
+        const Duration(seconds: 1), (Timer t) => fetchConsultations());
   }
 
   Future<void> fetchConsultations() async {
@@ -83,6 +88,7 @@ class _ZoomState extends State<Zoom> {
                     "Предприниматель: ${e.businessUser.firstName} ${e.businessUser.lastName}\nИнспектор: ${e.authorityUser.firstName} ${e.authorityUser.lastName}",
                 day: stringFromTimestamp(e.fromTime),
                 time: formatTime(e.fromTime),
+                endTime: formatTime(e.toTime),
               ),
             )
             .toList();
@@ -113,6 +119,128 @@ class _ZoomState extends State<Zoom> {
         .toDateTime()
         .compareTo(dateFromString(b.day!).toDateTime()));
     return c.reversed.toList();
+  }
+
+  Widget filterPanel() {
+    return Padding(
+      padding: EdgeInsets.only(bottom: 16),
+      child: Row(
+        children: [
+          Chip(
+            label: const Text(
+              "От 26 мая",
+              style: TextStyle(color: Colors.white, fontSize: 12),
+            ),
+            backgroundColor: ColorResources.accentRed,
+            deleteIcon: const Icon(
+              Icons.close,
+              size: 16,
+              color: Colors.white,
+            ),
+            onDeleted: () {},
+          ),
+          SizedBox(
+            width: 8,
+          ),
+          Chip(
+            label: const Text(
+              "До 11 июля",
+              style: TextStyle(color: Colors.white, fontSize: 12),
+            ),
+            backgroundColor: ColorResources.accentRed,
+            deleteIcon: const Icon(
+              Icons.close,
+              size: 16,
+              color: Colors.white,
+            ),
+            onDeleted: () {},
+          ),
+        ],
+      ),
+    );
+  }
+
+  ConsultationModel? getConsultationByDay(DateTime day) {
+    if (consultations
+        .where((element) => isSameDay(element.date(), day))
+        .isEmpty) {
+      return null;
+    }
+
+    return consultations
+        .firstWhere((element) => isSameDay(element.date(), day));
+  }
+
+  void showCalendar() {
+    showCupertinoModalBottomSheet(
+      context: context,
+      builder: (context) => Scaffold(
+        persistentFooterAlignment: AlignmentDirectional.center,
+        body: Container(
+          child: Stack(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 16),
+                    Text(
+                      "Календарь",
+                      style: GoogleFonts.ptSerif(fontSize: 32),
+                    ),
+                    const SizedBox(height: 32),
+                    EventCalendar(
+                      consultations: consultations,
+                      consultationByDate: getConsultationByDay,
+                      rangeSelectionEnabled: true,
+                    ),
+                    const SizedBox(height: 32),
+                    SizedBox(
+                      height: 48,
+                      width: double.infinity,
+                      child: CupertinoButton(
+                        color: ColorResources.accentRed,
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          "Применить",
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Positioned(
+                right: 12,
+                top: 12,
+                child: SizedBox(
+                  width: 32,
+                  height: 32,
+                  child: CupertinoButton(
+                    padding: EdgeInsets.all(0),
+                    borderRadius: BorderRadius.circular(64),
+                    color: CupertinoColors.systemGrey5,
+                    onPressed: () => Navigator.of(context).popUntil(
+                      (route) => route.settings.name == '/',
+                    ),
+                    child: const Icon(
+                      Icons.close,
+                      size: 20,
+                      color: CupertinoColors.darkBackgroundGray,
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget zoomCard(ConsultationModel consultation) {
@@ -147,7 +275,7 @@ class _ZoomState extends State<Zoom> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "${formatDate(consultation.day!)} в ${consultation.time}",
+                      "${formatDate(consultation.day!)} с ${consultation.time} до ${consultation.endTime}",
                       style: const TextStyle(
                           color: CupertinoColors.systemGrey, fontSize: 14),
                     ),
@@ -182,29 +310,7 @@ class _ZoomState extends State<Zoom> {
               child: IconButton(
                 icon: const Icon(CupertinoIcons.calendar),
                 onPressed: () {
-                  showDatePicker(
-                    builder: (context, child) {
-                      return Theme(
-                        data: Theme.of(context).copyWith(
-                          colorScheme: const ColorScheme.light(
-                            primary: ColorResources.accentRed,
-                            onPrimary: Colors.white,
-                            onSurface: Colors.black,
-                          ),
-                          textButtonTheme: TextButtonThemeData(
-                            style: TextButton.styleFrom(
-                              foregroundColor: ColorResources.accentRed,
-                            ),
-                          ),
-                        ),
-                        child: child!,
-                      );
-                    },
-                    context: context,
-                    firstDate: DateTime.parse("1900-01-01"),
-                    lastDate: DateTime.parse("2300-12-31"),
-                    initialDate: DateTime.now(),
-                  );
+                  showCalendar();
                 },
               ),
             ),
@@ -230,8 +336,7 @@ class _ZoomState extends State<Zoom> {
 
                         setState(
                           () {
-                            Future.delayed(const Duration(seconds: 3),
-                                () {
+                            Future.delayed(const Duration(seconds: 3), () {
                               fetchConsultations();
                             });
                           },
@@ -247,6 +352,7 @@ class _ZoomState extends State<Zoom> {
                       ),
                     ),
                   if (user.isBusiness()) SizedBox(height: 16),
+                  filterPanel(),
                   if (consultations.isEmpty)
                     Expanded(
                       child: Center(

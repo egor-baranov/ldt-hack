@@ -6,6 +6,7 @@ import 'package:lodt_hack/providers/LocalStorageProvider.dart';
 import 'package:lodt_hack/screens/account/edit_account.dart';
 import 'package:lodt_hack/screens/info.dart';
 import 'package:lodt_hack/utils/parser.dart';
+import 'package:lodt_hack/utils/widgets.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import '../../generated/google/protobuf/empty.pb.dart';
 import '../../models/User.dart';
@@ -228,14 +229,76 @@ class _AccountState extends State<Account> {
                           Navigator.push(
                             context,
                             CupertinoPageRoute(
-                              builder: (context) => const Info(
-                                title: 'Настройки уведомлений',
+                              builder: (context) => Info(
+                                title: 'Уведомления',
                                 description:
-                                    'В данный момент функция находится в стадии разработки',
+                                    '',
                                 externalLink: '',
                                 subtitle:
                                     'Удобно управляйте уведомлениями приложения',
                                 buttonLabel: 'Подтвердить',
+                                customBody: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "Все уведомления",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        CupertinoSwitch(
+                                          value: true,
+                                          onChanged: (v) {},
+                                          activeColor: ColorResources.accentRed,
+                                        )
+                                      ],
+                                    ),
+                                    Text(
+                                      "Консультации",
+                                      style: GoogleFonts.ptSerif(fontSize: 24),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "За час до консультации",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        CupertinoSwitch(
+                                          value: true,
+                                          onChanged: (v) {},
+                                          activeColor: ColorResources.accentRed,
+                                        )
+                                      ],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "За 15 минут до консультации",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        CupertinoSwitch(
+                                          value: true,
+                                          onChanged: (v) {},
+                                          activeColor: ColorResources.accentRed,
+                                        )
+                                      ],
+                                    ),
+                                    const SizedBox(height: 32),
+                                    Text(
+                                      "События",
+                                      style: GoogleFonts.ptSerif(fontSize: 24),
+                                    ),
+                                    const SizedBox(height: 32),
+                                  ],
+                                ),
                               ),
                             ),
                           );
@@ -249,7 +312,7 @@ class _AccountState extends State<Account> {
                           Navigator.push(
                             context,
                             CupertinoPageRoute(
-                              builder: (context) => const Info(
+                              builder: (context) => Info(
                                 title: 'Сообщить об ошибке',
                                 description:
                                     'В данный момент функция находится в стадии разработки',
@@ -257,6 +320,7 @@ class _AccountState extends State<Account> {
                                 subtitle:
                                     'Это поможет разработчикам сделать приложение еще удобнее и стабильнее',
                                 buttonLabel: 'Отправить',
+                                customBody: input("Текст ошибки"),
                               ),
                             ),
                           );
@@ -270,7 +334,7 @@ class _AccountState extends State<Account> {
                           Navigator.push(
                             context,
                             CupertinoPageRoute(
-                              builder: (context) => const Info(
+                              builder: (context) => Info(
                                 title: 'Помощь и поддержка',
                                 description:
                                     'В данный момент функция находится в стадии разработки',
@@ -278,6 +342,7 @@ class _AccountState extends State<Account> {
                                 subtitle:
                                     'При возникновении проблем обратитесь в службу помощи и поддержки приложения',
                                 buttonLabel: 'Отправить',
+                                customBody: input("Обращение в поддержку"),
                               ),
                             ),
                           );
@@ -299,6 +364,7 @@ class _AccountState extends State<Account> {
                                     'https://github.com/skcusltf/ldt-hack-2023',
                                 subtitle: 'Проект разработан командой skcusltf',
                                 buttonLabel: 'Ссылка на репозиторий',
+                                customBody: null,
                               ),
                             ),
                           );

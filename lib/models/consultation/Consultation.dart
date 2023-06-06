@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:lodt_hack/utils/parser.dart';
+
 class ConsultationModel {
   String? id;
   String? title;
@@ -10,6 +12,7 @@ class ConsultationModel {
 
   // format: 13:00
   String? time;
+  String? endTime;
 
   List<String>? tags;
 
@@ -19,6 +22,7 @@ class ConsultationModel {
     this.description,
     this.day,
     this.time,
+    this.endTime,
     this.tags,
   });
 
@@ -28,6 +32,7 @@ class ConsultationModel {
     description = json['description'];
     day = json['day'];
     time = json['time'];
+    endTime = json['end_time'];
     tags = (jsonDecode(json['tags']) as List<dynamic>)
         .map((e) => e as String)
         .toList();
@@ -40,7 +45,12 @@ class ConsultationModel {
       'description': description,
       'day': day,
       'time': time,
+      'end_time': endTime,
       'tags': jsonEncode(tags),
     };
+  }
+
+  DateTime date() {
+    return dateFromString(day!).toDateTime(toLocal: true);
   }
 }

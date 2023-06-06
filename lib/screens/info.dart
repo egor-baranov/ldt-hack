@@ -8,20 +8,21 @@ import '../styles/ColorResources.dart';
 import 'consultation.dart';
 
 class Info extends StatefulWidget {
-  const Info({
-    super.key,
-    required this.title,
-    required this.subtitle,
-    required this.description,
-    required this.externalLink,
-    required this.buttonLabel
-  });
+  const Info(
+      {super.key,
+      required this.title,
+      required this.subtitle,
+      required this.description,
+      required this.externalLink,
+      required this.buttonLabel,
+      required this.customBody});
 
   final String title;
   final String subtitle;
   final String description;
   final String externalLink;
   final String buttonLabel;
+  final Widget? customBody;
 
   @override
   State<Info> createState() => _InfoState();
@@ -69,8 +70,16 @@ class _InfoState extends State<Info> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 32),
-                      Container(
+                      widget.customBody != null
+                          ? Column(
+                              children: [
+                                const SizedBox(height: 32),
+                                widget.customBody!,
+                              ],
+                            )
+                          : const SizedBox(),
+                      const SizedBox(height: 32),
+                      SizedBox(
                         height: 48,
                         width: double.infinity,
                         child: CupertinoButton(
@@ -86,7 +95,7 @@ class _InfoState extends State<Info> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 16),
+                      const SizedBox(height: 16),
                     ],
                   ),
                 ),

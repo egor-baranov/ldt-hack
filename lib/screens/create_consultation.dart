@@ -19,6 +19,7 @@ import '../utils/parser.dart';
 import 'package:flutter_multi_formatter/flutter_multi_formatter.dart';
 import 'package:grpc/grpc.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class CreateConsultation extends StatefulWidget {
   const CreateConsultation({super.key});

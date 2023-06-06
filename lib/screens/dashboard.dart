@@ -6,6 +6,7 @@ import 'package:lodt_hack/screens/zoom.dart';
 import 'package:lodt_hack/utils/calendar.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 import '../clients/ApiClient.dart';
 import 'package:grpc/grpc.dart';
@@ -18,6 +19,7 @@ import '../styles/ColorResources.dart';
 import '../utils/parser.dart';
 import 'consultation.dart';
 import 'info.dart';
+import 'package:intl/intl.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard(
@@ -51,14 +53,14 @@ class _DashboardState extends State<Dashboard> {
         consultations.consultations = response.appointmentInfo
             .map(
               (e) => ConsultationModel(
-            id: e.id,
-            title: e.topic,
-            description:
-            "Предприниматель: ${e.businessUser.firstName} ${e.businessUser.lastName}\nИнспектор: ${e.authorityUser.firstName} ${e.authorityUser.lastName}",
-            day: stringFromTimestamp(e.fromTime),
-            time: formatTime(e.fromTime),
-          ),
-        )
+                id: e.id,
+                title: e.topic,
+                description:
+                    "Предприниматель: ${e.businessUser.firstName} ${e.businessUser.lastName}\nИнспектор: ${e.authorityUser.firstName} ${e.authorityUser.lastName}",
+                day: stringFromTimestamp(e.fromTime),
+                time: formatTime(e.fromTime),
+              ),
+            )
             .toList();
       });
     } on GrpcError catch (e) {
@@ -105,6 +107,7 @@ class _DashboardState extends State<Dashboard> {
     super.initState();
     fetchData();
   }
+
 
   Widget zoomCard(ConsultationModel consultation) {
     return Material(
@@ -193,6 +196,7 @@ class _DashboardState extends State<Dashboard> {
               externalLink: externalLink,
               subtitle: subtitle,
               buttonLabel: "Перейти на сайт",
+              customBody: null,
             ),
           ),
         ),
@@ -232,6 +236,18 @@ class _DashboardState extends State<Dashboard> {
       ),
     );
   }
+
+  ConsultationModel? getConsultationByDay(DateTime day) {
+    if (consultations.consultations
+        .where((element) => isSameDay(element.date(), day))
+        .isEmpty) {
+      return null;
+    }
+
+    return consultations.consultations
+        .firstWhere((element) => isSameDay(element.date(), day));
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -274,12 +290,10 @@ class _DashboardState extends State<Dashboard> {
                         "Расписание консультаций",
                         style: GoogleFonts.ptSerif(fontSize: 16),
                       ),
-                      expanded: CalendarDatePicker2(
-                        config: calendarConfig,
-                        value: _singleDatePickerValueWithDefaultValue,
-                        onValueChanged: (dates) => setState(
-                          () => _singleDatePickerValueWithDefaultValue = dates,
-                        ),
+                      expanded: EventCalendar(
+                        consultations: consultations.consultations,
+                        consultationByDate: getConsultationByDay,
+                        rangeSelectionEnabled: false,
                       ),
                       theme: const ExpandableThemeData(
                           tapHeaderToExpand: true, hasIcon: true),
@@ -312,7 +326,7 @@ class _DashboardState extends State<Dashboard> {
                                 ),
                               ),
                             ),
-                          ...sorted(consultations.consultations).take(5).map(
+                          ...sorted(consultations.consultations).take(3).map(
                                 (e) => Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [

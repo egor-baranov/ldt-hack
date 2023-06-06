@@ -6,6 +6,7 @@ import 'package:lodt_hack/screens/auth/auth.dart';
 import 'package:lodt_hack/screens/auth/login.dart';
 import 'package:lodt_hack/screens/info.dart';
 import 'package:lodt_hack/styles/ColorResources.dart';
+import 'package:lodt_hack/utils/widgets.dart';
 
 import 'models/User.dart';
 import 'screens/chat.dart';
@@ -13,8 +14,12 @@ import 'screens/dashboard.dart';
 import 'screens/zoom.dart';
 import 'styles/themes.dart';
 
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
+
 void main() {
-  runApp(MyApp());
+  Intl.defaultLocale = 'ru_RU';
+  initializeDateFormatting().then((_) => runApp(MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -22,9 +27,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Business checks app',
+      title: 'Открытый контроль',
       theme: light,
-      home: MyHomePage(title: 'Business checks app'),
+      home: MyHomePage(title: 'Открытый контроль'),
     );
   }
 }
@@ -141,7 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Navigator.push(
                 context,
                 CupertinoPageRoute(
-                  builder: (context) => const Info(
+                  builder: (context) => Info(
                     title: "Поиск по приложению",
                     subtitle:
                         "Ищите любую информацию из приложения в одном удобном месте",
@@ -149,6 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         "В данный момент функция находится в стадии разработки",
                     externalLink: "https://google.com",
                     buttonLabel: "Найти",
+                    customBody: searchBox(),
                   ),
                 ),
               );

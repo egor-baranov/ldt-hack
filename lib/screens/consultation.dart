@@ -132,6 +132,11 @@ class _ConsultationState extends State<Consultation> {
                     "Время начала",
                     widget.consultationModel.time,
                   ),
+                  SizedBox(height: 8),
+                  consultationCard(
+                    "Время окончания",
+                    widget.consultationModel.endTime,
+                  ),
                   SizedBox(height: 32),
                   Container(
                     height: 48,

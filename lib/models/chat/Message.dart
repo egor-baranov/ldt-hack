@@ -1,6 +1,20 @@
 import 'dart:convert';
 
+import 'package:lodt_hack/generated/app.pb.dart';
+
 enum MessageReaction { like, dislike, none }
+
+RateChatBotRequest_Rating toRating(MessageReaction reaction) {
+  if (reaction == MessageReaction.like) {
+    return RateChatBotRequest_Rating.RATING_POSITIVE;
+  }
+
+  if (reaction == MessageReaction.dislike) {
+    return RateChatBotRequest_Rating.RATING_NEGATIVE;
+  }
+
+  return RateChatBotRequest_Rating.RATING_REMOVED;
+}
 
 class Message {
   String text = "";

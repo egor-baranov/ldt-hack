@@ -255,6 +255,7 @@ class _AccountState extends State<Account> {
                                         )
                                       ],
                                     ),
+                                    const SizedBox(height: 32),
                                     Text(
                                       "Консультации",
                                       style: GoogleFonts.ptSerif(fontSize: 24),
@@ -295,6 +296,22 @@ class _AccountState extends State<Account> {
                                     Text(
                                       "События",
                                       style: GoogleFonts.ptSerif(fontSize: 24),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Row(
+                                      mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        const Text(
+                                          "Сообщения в чате",
+                                          style: TextStyle(fontSize: 16),
+                                        ),
+                                        CupertinoSwitch(
+                                          value: true,
+                                          onChanged: (v) {},
+                                          activeColor: ColorResources.accentRed,
+                                        )
+                                      ],
                                     ),
                                     const SizedBox(height: 32),
                                   ],

@@ -33,25 +33,46 @@ final calendarConfig = CalendarDatePicker2Config(
 );
 
 class EventCalendar extends StatefulWidget {
-  const EventCalendar(
-      {super.key,
-      required this.consultations,
-      required this.consultationByDate,
-      required this.rangeSelectionEnabled});
+  const EventCalendar({
+    super.key,
+    required this.consultations,
+    required this.consultationByDate,
+    required this.rangeSelectionEnabled,
+    required this.onSelect,
+    required this.rangeStart,
+    required this.rangeEnd,
+  });
 
   final List<ConsultationModel> consultations;
   final ConsultationModel? Function(DateTime) consultationByDate;
   final bool rangeSelectionEnabled;
+  final Function(DateTime?, DateTime?) onSelect;
+  final DateTime? rangeStart;
+  final DateTime? rangeEnd;
 
   @override
-  State<EventCalendar> createState() => _EventCalendarState();
+  State<EventCalendar> createState() => EventCalendarState();
 }
 
-class _EventCalendarState extends State<EventCalendar> {
+class EventCalendarState extends State<EventCalendar> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   DateTime? _rangeStart;
   DateTime? _rangeEnd;
+
+  @override
+  void initState() {
+    super.initState();
+    _rangeStart = widget.rangeStart;
+    _rangeEnd = widget.rangeEnd;
+  }
+
+  void clear() {
+    setState(() {
+      _rangeStart = null;
+      _rangeEnd = null;
+    });
+  }
 
   ConsultationModel? getConsultationByDay(DateTime day) {
     if (widget.consultations
@@ -121,6 +142,8 @@ class _EventCalendarState extends State<EventCalendar> {
             _focusedDay = focusedDay;
             _rangeStart = start;
             _rangeEnd = end;
+
+            widget.onSelect(_rangeStart, _rangeEnd);
           });
         },
         onDaySelected: (selectedDay, focusedDay) {

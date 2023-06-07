@@ -7,7 +7,6 @@ Widget searchBox() {
     obscureText:  false,
     inputFormatters: [],
     decoration: InputDecoration(
-      icon: Icon(CupertinoIcons.search),
       hintText: "Поиск",
       hintStyle: const TextStyle(color: Colors.grey),
       fillColor: CupertinoColors.extraLightBackgroundGray,

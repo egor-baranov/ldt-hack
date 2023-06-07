@@ -61,13 +61,12 @@ class _CallState extends State<Call> {
     await _engine.release();
   }
 
-
   Future<void> initAgora() async {
-
     await [Permission.microphone, Permission.camera].request();
 
     const appId = "faa5e42e20664f2e8090edd45ae9b1a6";
-    const token = "007eJxTYLj7IL7xJs8lLr11e2+eq25z/8i8cjb7L5d/ux8uXR47d2aGAkNaYqJpqolRqpGBmZlJmlGqhYGlQWpKiolpYqplkmGiWV9SfUpDICNDlPU6VkYGCATxWRhKUotLGBgALukiKA==";
+    const token =
+        "007eJxTYLj7IL7xJs8lLr11e2+eq25z/8i8cjb7L5d/ux8uXR47d2aGAkNaYqJpqolRqpGBmZlJmlGqhYGlQWpKiolpYqplkmGiWV9SfUpDICNDlPU6VkYGCATxWRhKUotLGBgALukiKA==";
     _engine = createAgoraRtcEngine();
     await _engine.initialize(const RtcEngineContext(
       appId: appId,
@@ -144,25 +143,28 @@ class _CallState extends State<Call> {
 
   Widget _remoteVideo() {
     if (_remoteUid != null) {
-      return Container(
-        padding: EdgeInsets.only(bottom: 32),
-        width: 400,
-        height: 600,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: AgoraVideoView(
-          controller: VideoViewController.remote(
-            rtcEngine: _engine,
-            canvas: VideoCanvas(uid: _remoteUid),
-            connection: RtcConnection(channelId: "test"),
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 32.0),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: SizedBox(
+            width: 400,
+            height: 600,
+            child: AgoraVideoView(
+              controller: VideoViewController.remote(
+                rtcEngine: _engine,
+                canvas: VideoCanvas(uid: _remoteUid),
+                connection: const RtcConnection(channelId: "test"),
+              ),
+            ),
           ),
         ),
       );
     } else {
-      return Text(
+      return const Text(
         'Пользователь еще не подключился',
         textAlign: TextAlign.center,
+        style: TextStyle(color: Colors.white),
       );
     }
   }
@@ -197,80 +199,80 @@ class _CallState extends State<Call> {
     return Container(
       color: Colors.transparent,
       alignment: Alignment.bottomCenter,
-      padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 8),
+      padding: const EdgeInsets.only(top: 32, bottom: 16, left: 8, right: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
           RawMaterialButton(
             constraints: BoxConstraints(maxWidth: 50),
             onPressed: showChat,
-            child: Icon(
-              CupertinoIcons.chat_bubble_text,
-              color: ColorResources.accentRed,
-              size: 20.0,
-            ),
             shape: CircleBorder(),
             elevation: 2.0,
             fillColor: Colors.white,
             padding: const EdgeInsets.all(12.0),
+            child: const Icon(
+              CupertinoIcons.chat_bubble_text,
+              color: ColorResources.accentRed,
+              size: 20.0,
+            ),
           ),
           RawMaterialButton(
             constraints: BoxConstraints(maxWidth: 50),
             onPressed: _onToggleMute,
+            shape: CircleBorder(),
+            elevation: 2.0,
+            fillColor: muted ? ColorResources.accentRed : Colors.white,
+            padding: const EdgeInsets.all(12.0),
             child: Icon(
               muted ? Icons.mic_off : Icons.mic,
               color: muted ? Colors.white : ColorResources.accentRed,
               size: 20.0,
             ),
-            shape: CircleBorder(),
-            elevation: 2.0,
-            fillColor: muted ? ColorResources.accentRed : Colors.white,
-            padding: const EdgeInsets.all(12.0),
           ),
           RawMaterialButton(
             constraints: BoxConstraints(maxWidth: 50),
             onPressed: () => _onCallEnd(context),
-            child: Icon(
-              Icons.call_end,
-              color: Colors.white,
-              size: 20.0,
-            ),
             shape: CircleBorder(),
             elevation: 2.0,
             fillColor: Colors.redAccent,
             padding: const EdgeInsets.all(12.0),
+            child: const Icon(
+              Icons.call_end,
+              color: Colors.white,
+              size: 20.0,
+            ),
           ),
           RawMaterialButton(
             constraints: BoxConstraints(maxWidth: 50),
             onPressed: _onSwitchCamera,
-            child: Icon(
+            shape: CircleBorder(),
+            elevation: 2.0,
+            fillColor: Colors.white,
+            padding: const EdgeInsets.all(12.0),
+            child: const Icon(
               Icons.switch_camera,
               color: ColorResources.accentRed,
               size: 20.0,
             ),
-            shape: CircleBorder(),
-            elevation: 2.0,
-            fillColor: Colors.white,
-            padding: const EdgeInsets.all(12.0),
           ),
           RawMaterialButton(
             constraints: BoxConstraints(maxWidth: 50),
             onPressed: _onToggleRecording,
-            child: recording
-                ? Icon(
-                    Icons.radio_button_checked_outlined,
-                    color: ColorResources.accentRed,
-                    size: 20.0,
-                  )
-                : Icon(
-                    Icons.radio_button_unchecked_rounded,
-                    color: Colors.black,
-                    size: 20,
-                  ),
             shape: CircleBorder(),
             elevation: 2.0,
             fillColor: Colors.white,
             padding: const EdgeInsets.all(12.0),
+            child: recording
+                ? const Icon(
+                    Icons.radio_button_checked_outlined,
+                    color: ColorResources.accentRed,
+                    size: 20.0,
+                  )
+                : const Icon(
+                    Icons.radio_button_unchecked_rounded,
+                    color: Colors.black,
+                    size: 20,
+                  ),
           ),
         ],
       ),
@@ -296,7 +298,6 @@ class _CallState extends State<Call> {
                       style: GoogleFonts.ptSerif(fontSize: 32),
                     ),
                     const SizedBox(height: 32),
-
                     const SizedBox(height: 32),
                     SizedBox(
                       height: 48,
@@ -307,7 +308,7 @@ class _CallState extends State<Call> {
                           Navigator.pop(context);
                         },
                         child: const Text(
-                          "Применить",
+                          "Отправить",
                           style: TextStyle(
                             color: Colors.white,
                           ),
@@ -346,29 +347,35 @@ class _CallState extends State<Call> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CupertinoColors.systemBackground,
+      backgroundColor: CupertinoColors.darkBackgroundGray,
       body: SafeArea(
         child: Container(
           padding: const EdgeInsets.all(16),
           child: Stack(
             children: [
               Center(
-                child: _remoteVideo(),
+                child: Padding(
+                  padding: const EdgeInsets.only(bottom: 32.0),
+                  child: _remoteVideo(),
+                ),
               ),
               Align(
                 alignment: Alignment.topLeft,
-                child: Container(
-                  width: 100,
-                  height: 150,
-                  child: Center(
-                    child: _localUserJoined
-                        ? AgoraVideoView(
-                      controller: VideoViewController(
-                        rtcEngine: _engine,
-                        canvas: const VideoCanvas(uid: 0),
-                      ),
-                    )
-                        : const CircularProgressIndicator(),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: SizedBox(
+                    width: 100,
+                    height: 150,
+                    child: Center(
+                      child: _localUserJoined
+                          ? AgoraVideoView(
+                              controller: VideoViewController(
+                                rtcEngine: _engine,
+                                canvas: const VideoCanvas(uid: 0),
+                              ),
+                            )
+                          : const CircularProgressIndicator(color: Colors.white,),
+                    ),
                   ),
                 ),
               ),

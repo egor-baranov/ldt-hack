@@ -15,6 +15,7 @@ class ConsultationModel {
   String? endTime;
 
   List<String>? tags;
+  bool? cancelled;
 
   ConsultationModel({
     this.id,
@@ -24,6 +25,7 @@ class ConsultationModel {
     this.time,
     this.endTime,
     this.tags,
+    this.cancelled,
   });
 
   ConsultationModel.fromJson(Map<String, dynamic> json) {
@@ -36,6 +38,7 @@ class ConsultationModel {
     tags = (jsonDecode(json['tags']) as List<dynamic>)
         .map((e) => e as String)
         .toList();
+    cancelled = jsonDecode(json['cancelled']);
   }
 
   Map<String, dynamic> toJson() {
@@ -47,6 +50,7 @@ class ConsultationModel {
       'time': time,
       'end_time': endTime,
       'tags': jsonEncode(tags),
+      'cancelled': jsonEncode(cancelled),
     };
   }
 

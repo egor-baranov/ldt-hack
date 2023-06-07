@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/clients/ApiClient.dart';
+import 'package:lodt_hack/generated/google/protobuf/timestamp.pb.dart';
 import 'package:lodt_hack/models/consultation/Consultation.dart';
 import 'package:lodt_hack/models/consultation/ConsultationHolder.dart';
 import 'package:lodt_hack/providers/LocalStorageProvider.dart';
@@ -33,6 +34,29 @@ class _ZoomState extends State<Zoom> {
   User user = User();
   String? token;
   Timer? timer;
+
+  DateTime? from = null;
+  DateTime? to = null;
+
+  DateTime? tempFrom = null;
+  DateTime? tempTo = null;
+
+  GlobalKey<EventCalendarState> eventCalendarKey = GlobalKey();
+
+  late Widget eventCalendar = EventCalendar(
+    key: eventCalendarKey,
+    consultations: consultations,
+    consultationByDate: getConsultationByDay,
+    rangeSelectionEnabled: true,
+    onSelect: (f, t) {
+      setState(() {
+        tempFrom = f;
+        tempTo = t;
+      });
+    },
+    rangeStart: from,
+    rangeEnd: to,
+  );
 
   void fetchData() {
     storageProvider.getUser().then(
@@ -68,8 +92,6 @@ class _ZoomState extends State<Zoom> {
       return;
     }
 
-    print("Fetching consultations..." + Random(100).nextInt(100).toString());
-
     try {
       final response = await apiClient.listConsultationAppointments(
         Empty(),
@@ -80,6 +102,12 @@ class _ZoomState extends State<Zoom> {
 
       setState(() {
         consultations = response.appointmentInfo
+            .where((e) =>
+                (to == null ||
+                        e.fromTime.toDateTime().isBefore(to!) ||
+                        isSameDay(e.fromTime.toDateTime(), to)) &&
+                    (from == null || e.toTime.toDateTime().isAfter(from!)) ||
+                isSameDay(e.toTime.toDateTime(), from))
             .map(
               (e) => ConsultationModel(
                 id: e.id,
@@ -89,6 +117,8 @@ class _ZoomState extends State<Zoom> {
                 day: stringFromTimestamp(e.fromTime),
                 time: formatTime(e.fromTime),
                 endTime: formatTime(e.toTime),
+                cancelled: e.canceled,
+                tags: e.canceled ? ["Отменена"] : e.toTime.toDateTime().isBefore(DateTime.now()) ? ["Есть запись"] : [],
               ),
             )
             .toList();
@@ -126,35 +156,45 @@ class _ZoomState extends State<Zoom> {
       padding: EdgeInsets.only(bottom: 16),
       child: Row(
         children: [
-          Chip(
-            label: const Text(
-              "От 26 мая",
-              style: TextStyle(color: Colors.white, fontSize: 12),
+          if (from != null)
+            Chip(
+              label: Text(
+                "От ${formatDate(stringFromTimestamp(Timestamp.fromDateTime(from!)))}",
+                style: TextStyle(color: Colors.white, fontSize: 12),
+              ),
+              backgroundColor: ColorResources.accentRed,
+              deleteIcon: const Icon(
+                Icons.close,
+                size: 16,
+                color: Colors.white,
+              ),
+              onDeleted: () {
+                setState(() {
+                  from = null;
+                });
+              },
             ),
-            backgroundColor: ColorResources.accentRed,
-            deleteIcon: const Icon(
-              Icons.close,
-              size: 16,
-              color: Colors.white,
-            ),
-            onDeleted: () {},
-          ),
           SizedBox(
             width: 8,
           ),
-          Chip(
-            label: const Text(
-              "До 11 июля",
-              style: TextStyle(color: Colors.white, fontSize: 12),
+          if (to != null)
+            Chip(
+              label: Text(
+                "До ${formatDate(stringFromTimestamp(Timestamp.fromDateTime(to!)))}",
+                style: TextStyle(color: Colors.white, fontSize: 12),
+              ),
+              backgroundColor: ColorResources.accentRed,
+              deleteIcon: const Icon(
+                Icons.close,
+                size: 16,
+                color: Colors.white,
+              ),
+              onDeleted: () {
+                setState(() {
+                  to = null;
+                });
+              },
             ),
-            backgroundColor: ColorResources.accentRed,
-            deleteIcon: const Icon(
-              Icons.close,
-              size: 16,
-              color: Colors.white,
-            ),
-            onDeleted: () {},
-          ),
         ],
       ),
     );
@@ -189,12 +229,16 @@ class _ZoomState extends State<Zoom> {
                       "Календарь",
                       style: GoogleFonts.ptSerif(fontSize: 32),
                     ),
-                    const SizedBox(height: 32),
-                    EventCalendar(
-                      consultations: consultations,
-                      consultationByDate: getConsultationByDay,
-                      rangeSelectionEnabled: true,
+                    const SizedBox(height: 16),
+                    const Text(
+                      "Выберите интервал, в котором будут отображаться консультации",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w300,
+                        fontSize: 16,
+                      ),
                     ),
+                    const SizedBox(height: 32),
+                    eventCalendar,
                     const SizedBox(height: 32),
                     SizedBox(
                       height: 48,
@@ -202,12 +246,35 @@ class _ZoomState extends State<Zoom> {
                       child: CupertinoButton(
                         color: ColorResources.accentRed,
                         onPressed: () {
+                          setState(() {
+                            from = tempFrom;
+                            to = tempTo;
+                          });
                           Navigator.pop(context);
                         },
                         child: const Text(
                           "Применить",
                           style: TextStyle(
                             color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Container(
+                      height: 48,
+                      width: double.infinity,
+                      child: CupertinoButton(
+                        color: ColorResources.accentPink,
+                        onPressed: () {
+                          setState(() {
+                            eventCalendarKey.currentState?.clear();
+                          });
+                        },
+                        child: const Text(
+                          "Сбросить",
+                          style: TextStyle(
+                            color: ColorResources.accentRed,
                           ),
                         ),
                       ),

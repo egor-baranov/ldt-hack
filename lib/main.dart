@@ -151,7 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     subtitle:
                         "Ищите любую информацию из приложения в одном удобном месте",
                     description:
-                        "В данный момент функция находится в стадии разработки",
+                        "",
                     externalLink: "https://google.com",
                     buttonLabel: "Найти",
                     customBody: searchBox(),

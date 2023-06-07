@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lodt_hack/clients/ApiClient.dart';
@@ -28,16 +30,12 @@ class ChatCard extends StatefulWidget {
 
 class _ChatCardState extends State<ChatCard> {
   Future<void> rate(MessageReaction messageReaction) async {
-    if (messageReaction == MessageReaction.none) {
-      return;
-    }
-
     try {
       await apiClient.rateChatBot(
         RateChatBotRequest(
-            requestMessage: "",
-            responseMessages: [widget.message.text],
-            rating: messageReaction == MessageReaction.like),
+          id: null,
+          rating: toRating(messageReaction),
+        ),
         options: CallOptions(
           metadata: {'Authorization': 'Bearer ${widget.token}'},
         ),
@@ -95,7 +93,8 @@ class _ChatCardState extends State<ChatCard> {
                                   ? Text(
                                       widget.message.text,
                                       softWrap: true,
-                                      style: const TextStyle(color: Colors.white),
+                                      style:
+                                          const TextStyle(color: Colors.white),
                                       maxLines: 10,
                                     )
                                   : MarkdownBody(

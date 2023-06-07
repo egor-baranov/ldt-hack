@@ -41,6 +41,10 @@ class _CallState extends State<Call> {
   String sid = "";
   int recUid = 0;
 
+  static const appId = "faa5e42e20664f2e8090edd45ae9b1a6";
+  String token =
+      "007eJxTYLj7IL7xJs8lLr11e2+eq25z/8i8cjb7L5d/ux8uXR47d2aGAkNaYqJpqolRqpGBmZlJmlGqhYGlQWpKiolpYqplkmGiWV9SfUpDICNDlPU6VkYGCATxWRhKUotLGBgALukiKA==";
+
   @override
   void initState() {
     super.initState();
@@ -61,12 +65,29 @@ class _CallState extends State<Call> {
     await _engine.release();
   }
 
+  Future<void> getToken() async {
+    final response = await http.get(
+      Uri.parse('http://agora-token-server-b6vh.onrender.com' + '/rtc/' + widget.channel + '/publisher/uid/' + uid.toString()
+        // To add expiry time uncomment the below given line with the time in seconds
+        // + '?expiry=45'
+      ),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        token = response.body;
+        token = jsonDecode(token)['rtcToken'];
+        print("got token = $token");
+      });
+    } else {
+      print('Failed to fetch the token');
+    }
+  }
+
   Future<void> initAgora() async {
     await [Permission.microphone, Permission.camera].request();
 
-    const appId = "faa5e42e20664f2e8090edd45ae9b1a6";
-    const token =
-        "007eJxTYLj7IL7xJs8lLr11e2+eq25z/8i8cjb7L5d/ux8uXR47d2aGAkNaYqJpqolRqpGBmZlJmlGqhYGlQWpKiolpYqplkmGiWV9SfUpDICNDlPU6VkYGCATxWRhKUotLGBgALukiKA==";
+    await getToken();
     _engine = createAgoraRtcEngine();
     await _engine.initialize(const RtcEngineContext(
       appId: appId,
@@ -94,7 +115,9 @@ class _CallState extends State<Call> {
             _remoteUid = null;
           });
         },
-        onTokenPrivilegeWillExpire: (RtcConnection connection, String token) {
+        onTokenPrivilegeWillExpire: (RtcConnection connection, String token) async {
+          await getToken();
+          await _engine.renewToken(token);
           debugPrint(
               '[onTokenPrivilegeWillExpire] connection: ${connection.toJson()}, token: $token');
         },
@@ -105,9 +128,10 @@ class _CallState extends State<Call> {
     await _engine.enableVideo();
     await _engine.startPreview();
 
+    print("joining channel with token=$token and channel=${widget.channel}");
     await _engine.joinChannel(
       token: token,
-      channelId: "test", // widget.channel
+      channelId: widget.channel, // widget.channel
       uid: 0,
       options: const ChannelMediaOptions(),
     );
@@ -154,7 +178,7 @@ class _CallState extends State<Call> {
               controller: VideoViewController.remote(
                 rtcEngine: _engine,
                 canvas: VideoCanvas(uid: _remoteUid),
-                connection: const RtcConnection(channelId: "test"),
+                connection: RtcConnection(channelId: widget.channel),
               ),
             ),
           ),

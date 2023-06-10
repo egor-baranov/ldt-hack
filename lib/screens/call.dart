@@ -32,7 +32,7 @@ class _CallState extends State<Call> {
 
   bool muted = false;
 
-  String baseUrl = ''; //Add the link of your deployed server
+  String baseUrl = 'https://cloud-recording-golang.onrender.com'; //Add the link of your deployed server
 
   // var required for recording the call
   bool recording = false;
@@ -67,7 +67,7 @@ class _CallState extends State<Call> {
 
   Future<void> getToken() async {
     final response = await http.get(
-      Uri.parse('http://agora-token-server-b6vh.onrender.com' + '/rtc/' + widget.channel + '/publisher/uid/' + uid.toString()
+      Uri.parse('http://agora-token-server-b6vh.onrender.com/rtc/${widget.channel}/publisher/uid/$uid'
         // To add expiry time uncomment the below given line with the time in seconds
         // + '?expiry=45'
       ),
@@ -205,10 +205,7 @@ class _CallState extends State<Call> {
   }
 
   void _onToggleRecording() async {
-    setState(() {
-      recording = !recording;
-    });
-    if (recording) {
+    if (!recording) {
       await _startRecording(widget.channel);
     } else {
       await _stopRecording(widget.channel, rid, sid, recUid);
@@ -414,7 +411,7 @@ class _CallState extends State<Call> {
   Future<void> _stopRecording(
       String mChannelName, String mRid, String mSid, int mRecUid) async {
     final response = await http.post(
-      Uri.parse(baseUrl + '/api/stop/call'),
+      Uri.parse('$baseUrl/api/stop/call/'),
       body: {
         "channel": mChannelName,
         "rid": mRid,
@@ -425,14 +422,17 @@ class _CallState extends State<Call> {
 
     if (response.statusCode == 200) {
       print('Recording Ended');
+      setState(() {
+        recording = false;
+      });
     } else {
-      print('Couldn\'t end the recording : ${response.statusCode}');
+      print('Couldn\'t end the recording : ${response.statusCode}, ${response.body}');
     }
   }
 
   Future<void> _startRecording(String channelName) async {
     final response = await http.post(
-      Uri.parse(baseUrl + '/api/start/call'),
+      Uri.parse('$baseUrl/api/start/call/'),
       body: {"channel": channelName},
     );
 
@@ -442,9 +442,10 @@ class _CallState extends State<Call> {
         rid = jsonDecode(response.body)['data']['rid'];
         recUid = jsonDecode(response.body)['data']['uid'];
         sid = jsonDecode(response.body)['data']['sid'];
+        recording = true;
       });
     } else {
-      print('Couldn\'t start the recording : ${response.statusCode}');
+      print('Couldn\'t start the recording : ${response.statusCode}, ${response.body}');
     }
   }
 }

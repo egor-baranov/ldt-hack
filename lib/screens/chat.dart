@@ -416,6 +416,7 @@ class _ChatState extends State<Chat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       bottomNavigationBar: chatInput(),
       body: CupertinoPageScaffold(
         child: CustomScrollView(
